@@ -1,4 +1,5 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import Input from "../components/Input"
 import {
   ALL,
   PLANTED,
@@ -8,7 +9,6 @@ import {
   type AquariumType,
 } from "../types/aquarium";
 
-let selectedTypeInAdd: AquariumType;
 const aquariumTypes: AquariumType[] = [
   ALL,
   PLANTED,
@@ -31,22 +31,37 @@ export default function AddAquariumModal({
   ) => boolean;
 }) {
   const nameRef = useRef<HTMLInputElement>(null);
+  const TDSRef = useRef<HTMLInputElement>(null);
   const volumeRef = useRef<HTMLInputElement>(null);
   const pHRef = useRef<HTMLInputElement>(null);
   const gHRef = useRef<HTMLInputElement>(null);
-  const TDSRef = useRef<HTMLInputElement>(null);
+
+  const [isNameEmpty, setIsNameEmpty] = useState(false);
+  const [isTDSEmpty, setIsTDSEmpty] = useState(false);
+  const [isVolumnEmpty, setIsVolumnEmpty] = useState(false);
+  const [isPHEmpty, setIsPHEmpty] = useState(false);
+  const [isGhEmpty, setIsGhEmpty] = useState(false);
+
+  const [selectedTypeInAdd, setSelectedTypeInAdd] = useState<AquariumType | undefined>(ALL);
+  const isSelectTypeEmpty = !(selectedTypeInAdd ? true : false);
 
   function onSaveAddAquarium(): void {
     const name = nameRef.current?.value.trim() ?? "";
+    if(name==="") setIsNameEmpty(true);
+    if(selectedTypeInAdd === ALL) setSelectedTypeInAdd(undefined); 
     const volumeValue = volumeRef.current?.value.trim() ?? "";
+    if(volumeValue==="") setIsVolumnEmpty(true);
     const pHValue = pHRef.current?.value.trim() ?? "";
+    if(pHValue==="") setIsPHEmpty(true);
     const gHValue = gHRef.current?.value.trim() ?? "";
+    if(gHValue==="") setIsGhEmpty(true);
     const tdsValue = TDSRef.current?.value.trim() ?? "";
-
+    if(tdsValue==="") setIsTDSEmpty(true);
+    if(!name || selectedTypeInAdd === ALL || !volumeValue || !pHValue || !gHValue || !tdsValue) return;
     if (
       onAddAquarium(
         name,
-        selectedTypeInAdd,
+        selectedTypeInAdd!,
         volumeValue,
         pHValue,
         gHValue,
@@ -98,8 +113,13 @@ export default function AddAquariumModal({
         >
           <label className="field aquarium-form__full-width">
             <span>Aquarium name</span>
-            <input
+            <Input
               ref={nameRef}
+              isEmpty={isNameEmpty}
+              onChange={(event) =>{
+                if(event.target.value) setIsNameEmpty(false);
+                else setIsNameEmpty(true);
+              }}
               name="name"
               type="text"
               placeholder="e.g. Living Room Planted Tank"
@@ -109,10 +129,11 @@ export default function AddAquariumModal({
           <label className="field">
             <span>Aquarium type</span>
             <select
+              style={isSelectTypeEmpty ? {border: "1px solid red"} : undefined}
               name="type"
               defaultValue=""
               onChange={(event) => {
-                selectedTypeInAdd = event.target.value as AquariumType;
+                setSelectedTypeInAdd(event.target.value as AquariumType);
               }}
             >
               <option value="" disabled>
@@ -130,8 +151,13 @@ export default function AddAquariumModal({
 
           <label className="field">
             <span>Volume (litres)</span>
-            <input
+            <Input
               ref={volumeRef}
+              isEmpty={isVolumnEmpty}
+              onChange={(event) =>{
+                if(event.target.value) setIsVolumnEmpty(false);
+                else setIsVolumnEmpty(true);
+              }}
               name="volumeLitres"
               type="number"
               min="1"
@@ -142,8 +168,13 @@ export default function AddAquariumModal({
 
           <label className="field">
             <span>pH</span>
-            <input
+            <Input
               ref={pHRef}
+              isEmpty={isPHEmpty}
+              onChange={(event) =>{
+                if(event.target.value) setIsPHEmpty(false);
+                else setIsPHEmpty(true);
+              }}
               name="ph"
               type="number"
               min="0"
@@ -155,8 +186,13 @@ export default function AddAquariumModal({
 
           <label className="field">
             <span>GH</span>
-            <input
+            <Input
               ref={gHRef}
+              isEmpty={isGhEmpty}
+              onChange={(event) =>{
+                if(event.target.value) setIsGhEmpty(false);
+                else setIsGhEmpty(true);
+              }}
               name="gh"
               type="number"
               min="0"
@@ -167,8 +203,13 @@ export default function AddAquariumModal({
 
           <label className="field aquarium-form__full-width">
             <span>TDS (ppm)</span>
-            <input
+            <Input
               ref={TDSRef}
+              isEmpty={isTDSEmpty}
+              onChange={(event) =>{
+                if(event.target.value) setIsTDSEmpty(false);
+                else setIsTDSEmpty(true);
+              }}
               name="tds"
               type="number"
               min="0"

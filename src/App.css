@@ -222,14 +222,18 @@ button {
   width: 100%;
   min-height: 48px;
   border: 1px solid #ccdcda;
+  color: #183130;
   border-radius: 12px;
   padding: 0 14px;
-  color: #183130;
   outline: none;
   background: white;
   transition:
     border-color 150ms ease,
     box-shadow 150ms ease;
+}
+
+.field .missing-value {
+  border: 1px solid red;
 }
 
 .field input:focus,
