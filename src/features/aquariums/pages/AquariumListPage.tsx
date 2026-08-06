@@ -151,6 +151,8 @@ function AquariumListPage() {
             className="secondary-button"
             onClick={() => {
               setSelectedType(ALL);
+              setFilteredAquarium(aquariums);
+              if(searchRef.current) searchRef.current.value = "";
             }}
           >
             Clear filters
