@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import Input from "./Input"
 import styles from "./AquariumModal.module.css";
+import {type AquariumModalProps, Action} from "../types/aquarium";
 import {
   ALL,
   PLANTED,
@@ -11,6 +12,7 @@ import {
   type Aquarium,
 } from "../types/aquarium";
 
+
 const aquariumTypes: AquariumType[] = [
   ALL,
   PLANTED,
@@ -18,33 +20,13 @@ const aquariumTypes: AquariumType[] = [
   NEOCARIDINA,
   COMMUNITY_FISH,
 ];
-export default function AquariumModal({
-  closeForm,
-  onAddAquarium,
-  onUpdateAquarium,
-  aquarium,
-  isAddAqua,
-}: {
-  closeForm: () => void;
-  onAddAquarium?: (
-    name: string,
-    selectedTypeInAdd: AquariumType,
-    volumeValue: string,
-    pHValue: string,
-    gHValue: string,
-    tdsValue: string,
-  ) => boolean;
-  onUpdateAquarium?: (
-    name: string,
-    selectedTypeInAdd: AquariumType,
-    volumeValue: number,
-    pHValue: number,
-    gHValue: number,
-    tdsValue: number,
-  ) => boolean;
-  aquarium?: Aquarium;
-  isAddAqua: boolean;
-}) {
+
+export default function AquariumModal(props: AquariumModalProps) {
+  let aquarium: Aquarium | null = null;
+  let isAddAqua:boolean = false;
+  if(props.mode === Action.EDIT) aquarium = props.aquarium;
+  if(props.mode === Action.ADD) isAddAqua = true;
+  
   const isReadOnly = aquarium ? true : false;
   const nameRef = useRef<HTMLInputElement>(null);
   const TDSRef = useRef<HTMLInputElement>(null);
@@ -82,7 +64,7 @@ export default function AquariumModal({
     console.log(selectedTypeInAdd); //TODO: Bug
     if(!name || selectedTypeInAdd === ALL || !volumeValue || !pHValue || !gHValue || !tdsValue) return;
 
-    if(isAddAqua && onAddAquarium(
+    if(isAddAqua && props.mode === Action.ADD && props.onAddAquarium(
         name,
         selectedTypeInAdd!,
         volumeValue,
@@ -90,18 +72,17 @@ export default function AquariumModal({
         gHValue,
         tdsValue,
       )){
-      closeForm();
+      props.closeForm();
     }
 
 
-    else if(isEdit && onUpdateAquarium && onUpdateAquarium(name,
+    else if(isEdit && props.mode === Action.EDIT && props.onUpdateAquarium(name,
         selectedTypeInAdd!,
         Number(volumeValue),
         Number(pHValue),
         Number(gHValue),
         Number(tdsValue))){
-      closeForm();
-
+      props.closeForm();
     }
   }
 
@@ -115,7 +96,7 @@ export default function AquariumModal({
       role="presentation"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) {
-          closeForm();
+          props.closeForm();
         }
       }}
     >
@@ -140,7 +121,7 @@ export default function AquariumModal({
             className={styles.closeButton}
             type="button"
             aria-label="Close add aquarium form"
-            onClick={closeForm}
+            onClick={props.closeForm}
           >
             &times;
           </button>
@@ -280,7 +261,7 @@ export default function AquariumModal({
             <button
               className={styles.secondaryButton}
               type="button"
-              onClick={closeForm}
+              onClick={props.closeForm}
             >
               Cancel
             </button>

@@ -28,3 +28,37 @@ export interface Aquarium {
   gh: number;
   tds: number;
 }
+
+export const Action = {
+  ADD: "ADD",
+  EDIT: "EDIT"
+} as const;
+
+type AddModalProps = {
+  mode: typeof Action.ADD;
+  closeForm: () => void;
+  onAddAquarium: (
+    name: string,
+    type: AquariumType,
+    volume: string,
+    ph: string,
+    gh: string,
+    tds: string,
+  ) => boolean;
+};
+
+type EditModalProps = {
+  mode: typeof Action.EDIT;
+  closeForm: () => void;
+  aquarium: Aquarium;
+  onUpdateAquarium: (
+    name: string,
+    type: AquariumType,
+    volume: number,
+    ph: number,
+    gh: number,
+    tds: number,
+  ) => boolean;
+};
+
+export type AquariumModalProps = AddModalProps | EditModalProps;

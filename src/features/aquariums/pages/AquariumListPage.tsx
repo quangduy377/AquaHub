@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import AquariumCard from "../components/AquariumCard";
 import { aquariums } from "../data/aquariumData";
-import type { AquariumType, Aquarium } from "../types/aquarium";
+import { type AquariumType, type Aquarium, Action } from "../types/aquarium";
 import { ALL, AQUARIUM_TYPES } from "../types/aquarium";
 import AquariumModal from "../components/AquariumModal";
 import styles from "./AquariumListPage.module.css";
@@ -133,15 +133,15 @@ function AquariumListPage() {
       </section>
 
       {isAddFormOpen && (
-        <AquariumModal closeForm={closeForm} onAddAquarium={onAddAquarium} isAddAqua={true}/>
+        <AquariumModal mode={Action.ADD} closeForm={closeForm} onAddAquarium={onAddAquarium}/>
       )}
 
       {selectedAquarium && (
         <AquariumModal
+          mode={Action.EDIT}
           aquarium={selectedAquarium}
           onUpdateAquarium={onUpdateAquarium}
           closeForm={closeAquariumDetail}
-          isAddAqua={false}
         />
       )}
 
