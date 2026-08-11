@@ -1,0 +1,14 @@
+.input {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #ccdcda;
+  border-radius: 12px;
+  padding: 0 14px;
+  color: #183130;
+  outline: none;
+  background: white;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.input:focus { border-color: #16836f; box-shadow: 0 0 0 4px rgb(22 131 111 / 12%); }
+.invalid { border-color: red; }

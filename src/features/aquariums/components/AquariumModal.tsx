@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
-import Input from "../components/Input"
+import Input from "./Input"
+import styles from "./AquariumModal.module.css";
 import {
   ALL,
   PLANTED,
@@ -7,6 +8,7 @@ import {
   NEOCARIDINA,
   COMMUNITY_FISH,
   type AquariumType,
+  type Aquarium,
 } from "../types/aquarium";
 
 const aquariumTypes: AquariumType[] = [
@@ -16,12 +18,15 @@ const aquariumTypes: AquariumType[] = [
   NEOCARIDINA,
   COMMUNITY_FISH,
 ];
-export default function AddAquariumModal({
+export default function AquariumModal({
   closeForm,
   onAddAquarium,
+  onUpdateAquarium,
+  aquarium,
+  isAddAqua,
 }: {
   closeForm: () => void;
-  onAddAquarium: (
+  onAddAquarium?: (
     name: string,
     selectedTypeInAdd: AquariumType,
     volumeValue: string,
@@ -29,7 +34,18 @@ export default function AddAquariumModal({
     gHValue: string,
     tdsValue: string,
   ) => boolean;
+  onUpdateAquarium?: (
+    name: string,
+    selectedTypeInAdd: AquariumType,
+    volumeValue: number,
+    pHValue: number,
+    gHValue: number,
+    tdsValue: number,
+  ) => boolean;
+  aquarium?: Aquarium;
+  isAddAqua: boolean;
 }) {
+  const isReadOnly = aquarium ? true : false;
   const nameRef = useRef<HTMLInputElement>(null);
   const TDSRef = useRef<HTMLInputElement>(null);
   const volumeRef = useRef<HTMLInputElement>(null);
@@ -41,9 +57,15 @@ export default function AddAquariumModal({
   const [isVolumnEmpty, setIsVolumnEmpty] = useState(false);
   const [isPHEmpty, setIsPHEmpty] = useState(false);
   const [isGhEmpty, setIsGhEmpty] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
 
-  const [selectedTypeInAdd, setSelectedTypeInAdd] = useState<AquariumType | undefined>(ALL);
+  const defaultType = aquarium ? aquarium.type : ALL;
+  const [selectedTypeInAdd, setSelectedTypeInAdd] = useState<AquariumType | undefined>(defaultType);
   const isSelectTypeEmpty = !(selectedTypeInAdd ? true : false);
+
+  function enterEditMode(): void{
+    setIsEdit(true);
+  }
 
   function onSaveAddAquarium(): void {
     const name = nameRef.current?.value.trim() ?? "";
@@ -57,23 +79,39 @@ export default function AddAquariumModal({
     if(gHValue==="") setIsGhEmpty(true);
     const tdsValue = TDSRef.current?.value.trim() ?? "";
     if(tdsValue==="") setIsTDSEmpty(true);
+    console.log(selectedTypeInAdd); //TODO: Bug
     if(!name || selectedTypeInAdd === ALL || !volumeValue || !pHValue || !gHValue || !tdsValue) return;
-    if (
-      onAddAquarium(
+
+    if(isAddAqua && onAddAquarium(
         name,
         selectedTypeInAdd!,
         volumeValue,
         pHValue,
         gHValue,
         tdsValue,
-      )
-    )
+      )){
       closeForm();
+    }
+
+
+    else if(isEdit && onUpdateAquarium && onUpdateAquarium(name,
+        selectedTypeInAdd!,
+        Number(volumeValue),
+        Number(pHValue),
+        Number(gHValue),
+        Number(tdsValue))){
+      closeForm();
+
+    }
   }
+
+  let buttonName;
+  if(isEdit || isAddAqua) buttonName = "Save"; //TODO: May add the "Add" condition
+  else buttonName = "Edit"; 
 
   return (
     <div
-      className="modal-backdrop"
+      className={styles.backdrop}
       role="presentation"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) {
@@ -82,20 +120,24 @@ export default function AddAquariumModal({
       }}
     >
       <section
-        className="aquarium-form-modal"
+        className={styles.modal}
         role="dialog"
         aria-modal="true"
         aria-labelledby="add-aquarium-title"
       >
-        <div className="aquarium-form-modal__header">
+        <div className={styles.header}>
           <div>
-            <span className="form-eyebrow">New aquarium</span>
-            <h2 id="add-aquarium-title">Add an aquarium</h2>
-            <p>Enter the tank details and current water parameters.</p>
+            <span className={styles.eyebrow}>
+              {aquarium ? "" : "New aquarium"}
+            </span>
+            <h2 id="add-aquarium-title">
+              {aquarium ? aquarium.name : "Add an aquarium"}
+            </h2>
+            <p>{aquarium ? "" : "Enter the tank details and current water parameters."}</p>
           </div>
 
           <button
-            className="modal-close-button"
+            className={styles.closeButton}
             type="button"
             aria-label="Close add aquarium form"
             onClick={closeForm}
@@ -105,16 +147,23 @@ export default function AddAquariumModal({
         </div>
 
         <form
-          className="aquarium-form"
+          className={styles.form}
           onSubmit={(event) => {
             event.preventDefault();
-            onSaveAddAquarium();
+            if(isAddAqua || isEdit){
+              onSaveAddAquarium();
+            }
+            else{
+              enterEditMode();
+            }
           }}
         >
-          <label className="field aquarium-form__full-width">
+          <label className={`${styles.field} ${styles.fullWidth}`}>
             <span>Aquarium name</span>
             <Input
               ref={nameRef}
+              readOnly={isReadOnly && !isEdit}
+              defaultValue={aquarium?.name ?? ""}
               isEmpty={isNameEmpty}
               onChange={(event) =>{
                 if(event.target.value) setIsNameEmpty(false);
@@ -126,12 +175,13 @@ export default function AddAquariumModal({
             />
           </label>
 
-          <label className="field">
+          <label className={styles.field}>
             <span>Aquarium type</span>
             <select
-              style={isSelectTypeEmpty ? {border: "1px solid red"} : undefined}
+              className={isSelectTypeEmpty ? styles.invalid : undefined}
+              disabled={isReadOnly && !isEdit}
               name="type"
-              defaultValue=""
+              defaultValue={aquarium ? aquarium.type : ""}
               onChange={(event) => {
                 setSelectedTypeInAdd(event.target.value as AquariumType);
               }}
@@ -149,10 +199,12 @@ export default function AddAquariumModal({
             </select>
           </label>
 
-          <label className="field">
+          <label className={styles.field}>
             <span>Volume (litres)</span>
             <Input
               ref={volumeRef}
+              defaultValue={aquarium?.volumeLitres ?? ""}
+              readOnly={isReadOnly && !isEdit}
               isEmpty={isVolumnEmpty}
               onChange={(event) =>{
                 if(event.target.value) setIsVolumnEmpty(false);
@@ -166,11 +218,13 @@ export default function AddAquariumModal({
             />
           </label>
 
-          <label className="field">
+          <label className={styles.field}>
             <span>pH</span>
             <Input
               ref={pHRef}
               isEmpty={isPHEmpty}
+              defaultValue={aquarium?.ph ?? ""}
+              readOnly={isReadOnly && !isEdit}
               onChange={(event) =>{
                 if(event.target.value) setIsPHEmpty(false);
                 else setIsPHEmpty(true);
@@ -184,11 +238,13 @@ export default function AddAquariumModal({
             />
           </label>
 
-          <label className="field">
+          <label className={styles.field}>
             <span>GH</span>
             <Input
               ref={gHRef}
               isEmpty={isGhEmpty}
+              defaultValue={aquarium?.gh ?? ""}
+              readOnly={isReadOnly && !isEdit}
               onChange={(event) =>{
                 if(event.target.value) setIsGhEmpty(false);
                 else setIsGhEmpty(true);
@@ -201,10 +257,12 @@ export default function AddAquariumModal({
             />
           </label>
 
-          <label className="field aquarium-form__full-width">
+          <label className={`${styles.field} ${styles.fullWidth}`}>
             <span>TDS (ppm)</span>
             <Input
               ref={TDSRef}
+              defaultValue={aquarium?.tds ?? ""}
+              readOnly={isReadOnly && !isEdit}
               isEmpty={isTDSEmpty}
               onChange={(event) =>{
                 if(event.target.value) setIsTDSEmpty(false);
@@ -218,16 +276,16 @@ export default function AddAquariumModal({
             />
           </label>
 
-          <div className="aquarium-form__actions">
+          <div className={styles.actions}>
             <button
-              className="secondary-button"
+              className={styles.secondaryButton}
               type="button"
               onClick={closeForm}
             >
               Cancel
             </button>
-            <button className="primary-button" type="submit">
-              Save aquarium
+            <button className={styles.primaryButton} type="submit">
+              {buttonName}
             </button>
           </div>
         </form>

@@ -57,18 +57,26 @@ src/
 |-- features/
 |   `-- aquariums/
 |       |-- components/
-|       |   `-- AquariumCard.tsx
+|       |   |-- AquariumCard.tsx
+|       |   |-- AquariumCard.module.css
+|       |   |-- AquariumModal.tsx
+|       |   |-- AquariumModal.module.css
+|       |   |-- Input.tsx
+|       |   `-- Input.module.css
 |       |-- data/
 |       |   `-- aquariumData.ts
 |       |-- pages/
-|       |   `-- AquariumListPage.tsx
+|       |   |-- AquariumListPage.tsx
+|       |   `-- AquariumListPage.module.css
 |       `-- types/
 |           `-- aquarium.ts
 |-- App.tsx
-|-- App.css
 |-- index.css
 `-- main.tsx
 ```
+
+Component and page styles use CSS Modules to keep class names locally scoped.
+`index.css` contains only the global foundation styles and element resets.
 
 The current render flow is:
 

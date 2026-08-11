@@ -1,9 +1,10 @@
-import { useState, useRef, type ChangeEvent } from "react";
+import { useState, useRef } from "react";
 import AquariumCard from "../components/AquariumCard";
 import { aquariums } from "../data/aquariumData";
 import type { AquariumType, Aquarium } from "../types/aquarium";
 import { ALL, AQUARIUM_TYPES } from "../types/aquarium";
-import AddAquariumModal from "../components/AddAquariumModal";
+import AquariumModal from "../components/AquariumModal";
+import styles from "./AquariumListPage.module.css";
 
 const generateRandomId = (): number => {
   return Math.floor(Math.random() * 1_000_000);
@@ -14,8 +15,16 @@ function AquariumListPage() {
   const [filteredAquariums, setFilteredAquarium] =
     useState<Aquarium[]>(aquariums);
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
-
+  const [selectedAquarium, setSelectedAquarium] = useState<Aquarium | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+
+  function openAquariumDetail(aquarium: Aquarium) {
+    setSelectedAquarium(aquarium);
+  }
+
+  function closeAquariumDetail() {
+    setSelectedAquarium(null);
+  }
 
   function openForm() {
     setIsAddFormOpen(true);
@@ -38,6 +47,37 @@ function AquariumListPage() {
     });
     setFilteredAquarium(filteredAquariums);
   }
+
+  function onUpdateAquarium(
+    name: string,
+    selectedTypeInAdd: AquariumType,
+    volumeValue: number,
+    pHValue: number,
+    gHValue: number,
+    tdsValue: number,): boolean{
+      if(!name || !selectedTypeInAdd || !volumeValue ||
+      !pHValue || !gHValue || !tdsValue) return false;
+
+      const newAqua: Aquarium = {
+        id: selectedAquarium!.id,
+        name : name,
+        type: selectedTypeInAdd,
+        volumeLitres: volumeValue,
+        ph: pHValue,
+        gh: gHValue,
+        tds: tdsValue
+      }
+      setSelectedAquarium(newAqua);
+      setFilteredAquarium(prev=>{
+        const newAquas = [...prev];
+        const selectedAquaIndex = newAquas.findIndex(aqua => aqua.id === selectedAquarium!.id);
+        newAquas[selectedAquaIndex] = newAqua;
+        return newAquas;
+      });
+      return true;
+  }
+
+
 
   function onAddAquarium(
     name: string,
@@ -77,27 +117,36 @@ function AquariumListPage() {
   }
 
   return (
-    <main className="page">
-      <section className="hero">
+    <main className={styles.page}>
+      <section className={styles.hero}>
         <div>
-          <span className="hero__eyebrow">AquaHub Dashboard</span>
+          <span className={styles.eyebrow}>AquaHub Dashboard</span>
           <h1>My Aquariums</h1>
           <p>
             Track your aquariums and keep an eye on important water parameters.
           </p>
         </div>
 
-        <button className="primary-button" type="button" onClick={openForm}>
+        <button className={styles.primaryButton} type="button" onClick={openForm}>
           + Add aquarium
         </button>
       </section>
 
       {isAddFormOpen && (
-        <AddAquariumModal closeForm={closeForm} onAddAquarium={onAddAquarium} />
+        <AquariumModal closeForm={closeForm} onAddAquarium={onAddAquarium} isAddAqua={true}/>
       )}
 
-      <section className="filter-panel">
-        <label className="field">
+      {selectedAquarium && (
+        <AquariumModal
+          aquarium={selectedAquarium}
+          onUpdateAquarium={onUpdateAquarium}
+          closeForm={closeAquariumDetail}
+          isAddAqua={false}
+        />
+      )}
+
+      <section className={styles.filterPanel}>
+        <label className={styles.field}>
           <span>Search</span>
 
           <input
@@ -108,7 +157,7 @@ function AquariumListPage() {
           />
         </label>
 
-        <label className="field">
+        <label className={styles.field}>
           <span>Aquarium type</span>
 
           <select
@@ -126,7 +175,7 @@ function AquariumListPage() {
         </label>
       </section>
 
-      <section className="results-header">
+      <section className={styles.resultsHeader}>
         <h2>Your tanks</h2>
         <span>
           {filteredAquariums.length}{" "}
@@ -135,20 +184,20 @@ function AquariumListPage() {
       </section>
 
       {filteredAquariums.length > 0 ? (
-        <section className="aquarium-grid">
+        <section className={styles.grid}>
           {filteredAquariums.map((aquarium) => (
-            <AquariumCard key={aquarium.id} aquarium={aquarium} />
+            <AquariumCard key={aquarium.id} aquarium={aquarium} onViewDetails={openAquariumDetail}/>
           ))}
         </section>
       ) : (
-        <section className="empty-state">
-          <div className="empty-state__icon">⌕</div>
+        <section className={styles.emptyState}>
+          <div className={styles.emptyIcon}>⌕</div>
           <h2>No aquariums found</h2>
           <p>Try changing the aquarium name or selected type.</p>
 
           <button
             type="button"
-            className="secondary-button"
+            className={styles.secondaryButton}
             onClick={() => {
               setSelectedType(ALL);
               setFilteredAquarium(aquariums);

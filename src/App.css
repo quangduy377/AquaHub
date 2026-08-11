@@ -233,7 +233,7 @@ button {
 }
 
 .field .missing-value {
-  border: 1px solid red;
+  border: 1px solid #ff0000;
 }
 
 .field input:focus,
