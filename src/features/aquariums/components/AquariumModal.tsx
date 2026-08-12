@@ -23,10 +23,7 @@ const aquariumTypes: AquariumType[] = [
 
 export default function AquariumModal(props: AquariumModalProps) {
   let aquarium: Aquarium | null = null;
-  let isAddAqua:boolean = false;
-  if(props.mode === Action.EDIT) aquarium = props.aquarium;
-  if(props.mode === Action.ADD) isAddAqua = true;
-  
+  if(props.mode === Action.VIEW) aquarium = props.aquarium;  
   const isReadOnly = aquarium ? true : false;
   const nameRef = useRef<HTMLInputElement>(null);
   const TDSRef = useRef<HTMLInputElement>(null);
@@ -64,7 +61,7 @@ export default function AquariumModal(props: AquariumModalProps) {
     console.log(selectedTypeInAdd); //TODO: Bug
     if(!name || selectedTypeInAdd === ALL || !volumeValue || !pHValue || !gHValue || !tdsValue) return;
 
-    if(isAddAqua && props.mode === Action.ADD && props.onAddAquarium(
+    if(props.mode === Action.ADD && props.onAddAquarium(
         name,
         selectedTypeInAdd!,
         volumeValue,
@@ -75,8 +72,7 @@ export default function AquariumModal(props: AquariumModalProps) {
       props.closeForm();
     }
 
-
-    else if(isEdit && props.mode === Action.EDIT && props.onUpdateAquarium(name,
+    else if(props.mode === Action.VIEW && isEdit && props.onUpdateAquarium(name,
         selectedTypeInAdd!,
         Number(volumeValue),
         Number(pHValue),
@@ -87,7 +83,7 @@ export default function AquariumModal(props: AquariumModalProps) {
   }
 
   let buttonName;
-  if(isEdit || isAddAqua) buttonName = "Save"; //TODO: May add the "Add" condition
+  if(isEdit || props.mode === Action.ADD) buttonName = "Save"; //TODO: May add the "Add" condition
   else buttonName = "Edit"; 
 
   return (
@@ -131,7 +127,7 @@ export default function AquariumModal(props: AquariumModalProps) {
           className={styles.form}
           onSubmit={(event) => {
             event.preventDefault();
-            if(isAddAqua || isEdit){
+            if(props.mode === Action.ADD || isEdit){
               onSaveAddAquarium();
             }
             else{

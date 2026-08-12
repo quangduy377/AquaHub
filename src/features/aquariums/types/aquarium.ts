@@ -31,7 +31,7 @@ export interface Aquarium {
 
 export const Action = {
   ADD: "ADD",
-  EDIT: "EDIT"
+  VIEW : "VIEW",
 } as const;
 
 type AddModalProps = {
@@ -47,8 +47,8 @@ type AddModalProps = {
   ) => boolean;
 };
 
-type EditModalProps = {
-  mode: typeof Action.EDIT;
+type ViewModalProps = {
+  mode: typeof Action.VIEW;
   closeForm: () => void;
   aquarium: Aquarium;
   onUpdateAquarium: (
@@ -61,4 +61,4 @@ type EditModalProps = {
   ) => boolean;
 };
 
-export type AquariumModalProps = AddModalProps | EditModalProps;
+export type AquariumModalProps = AddModalProps | ViewModalProps;

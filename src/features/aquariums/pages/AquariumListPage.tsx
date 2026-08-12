@@ -138,9 +138,9 @@ function AquariumListPage() {
 
       {selectedAquarium && (
         <AquariumModal
-          mode={Action.EDIT}
-          aquarium={selectedAquarium}
+          mode={Action.VIEW}
           onUpdateAquarium={onUpdateAquarium}
+          aquarium={selectedAquarium}
           closeForm={closeAquariumDetail}
         />
       )}
