@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useParams } from "react-router-dom";
 import AquariumCard from "../components/AquariumCard";
 import { aquariums } from "../data/aquariumData";
 import { type AquariumType, type Aquarium, Action } from "../types/aquarium";
@@ -11,6 +12,7 @@ const generateRandomId = (): number => {
 };
 
 function AquariumListPage() {
+  const {email} = useParams<{email:string}>();
   const [selectedType, setSelectedType] = useState<AquariumType>(ALL);
   const [filteredAquariums, setFilteredAquarium] =
     useState<Aquarium[]>(aquariums);
@@ -121,7 +123,7 @@ function AquariumListPage() {
       <section className={styles.hero}>
         <div>
           <span className={styles.eyebrow}>AquaHub Dashboard</span>
-          <h1>My Aquariums</h1>
+          <h1>{`${email} 's Aquariums`}</h1>
           <p>
             Track your aquariums and keep an eye on important water parameters.
           </p>

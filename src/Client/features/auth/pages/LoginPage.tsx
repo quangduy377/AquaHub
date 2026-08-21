@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from "react";
 import styles from "./LoginPage.module.css";
-import CustomButton from "../../../common/CustomButton/CustomButton";
+import CustomButton from "../../../CustomButton/CustomButton";
 import { login, resetPassword } from "../services/authService";
 import { useNavigate } from "react-router-dom";
-import { ROUTES } from "../../../routes/AquaRoutes";
+import { PARAM_ROUTES } from "../../../routes/AquaRoutes";
 
 const LOGIN_VIEW = "LOGIN_VIEW";
 const FORGET_PASSWORD_VIEW = "FORGOT_PASSWORD_VIEW";
@@ -87,7 +87,7 @@ export default function LoginPage() {
           password,
         });
         setSuccessMessage(SignInSuccessfulMsg);
-        navigate(ROUTES.AQUARIUMS, { replace: true });
+        navigate(PARAM_ROUTES.AQUARIUMS(email), { replace: true });
       }
       catch(ex){
         if(ex instanceof Error){

@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import AquariumListPage from "./features/aquariums/pages/AquariumListPage";
-import LoginPage from "./features/auth/pages/LoginPage";
-import { ROUTES } from "./routes/AquaRoutes";
+import AquariumListPage from "./Client/features/aquariums/pages/AquariumListPage";
+import LoginPage from "./Client/features/auth/pages/LoginPage";
+import { ROUTES } from "./Client/routes/AquaRoutes";
 function App() {
   return (
     <Routes>
