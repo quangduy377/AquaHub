@@ -5,6 +5,6 @@ export interface LoginCredentials {
 
 export type LoginHandler = (
   credentials: LoginCredentials,
-) => void | Promise<void>;
+) => Promise<boolean>;
 
-export type ResetPasswordHandler = (email: string) => void | Promise<void>;
+export type ResetPasswordHandler = (email: string) => Promise<boolean>;

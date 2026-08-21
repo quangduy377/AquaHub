@@ -53,12 +53,11 @@
 .error { color: #b83e3e; font-size: 12px; }
 .textButton { align-self: flex-end; border: 0; padding: 0; color: #137563; background: transparent; font-size: 13px; font-weight: 750; }
 .textButton:hover, .backButton:hover { text-decoration: underline; }
-.formError, .success { margin: 0; border-radius: 10px; padding: 12px 14px; font-size: 13px; line-height: 1.45; }
+.formError, .success, .failed { margin: 0; border-radius: 10px; padding: 12px 14px; font-size: 13px; line-height: 1.45; }
 .formError { color: #8d2d2d; background: #fff0f0; }
 .success { color: #126554; background: #e7f7f2; }
-.submitButton { min-height: 50px; border: 0; border-radius: 12px; padding: 0 20px; color: white; background: #16836f; box-shadow: 0 10px 24px rgb(22 131 111 / 20%); font-weight: 800; transition: background 150ms ease, transform 150ms ease; }
-.submitButton:hover:not(:disabled) { background: #106f5e; transform: translateY(-1px); }
-.submitButton:disabled { cursor: wait; opacity: .65; }
+.failed { color: red; background: #e7f7f2; }
+
 .backButton { align-self: center; border: 0; padding: 4px; color: #526d69; background: transparent; font-weight: 700; }
 
 @media (max-width: 800px) {
