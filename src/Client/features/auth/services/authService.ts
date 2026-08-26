@@ -2,42 +2,35 @@
 
 import type { LoginCredentials } from "../types/auth";
 
-//TODO: REMOVE_THIS
-const DUMMY_EMAIL = "quangduy377@gmail.com";
-const DUMMY_PASSWORD = "123456";
-
-function delay(milliseconds: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, milliseconds);
-  });
-}
+const LOGIN_ENDPOINT = "/api/auth/login";
+const LOGIN_FAILED_MESSAGE = "Email or password is incorrect.";
+const UNKNOWN_ERROR_MESSAGE = "An unidentified error occurred.";
 
 export async function login(
   credentials: LoginCredentials,
 ): Promise<void> {
-  // TODO Use real API
-  try{
-    // const response = await fetch("/api/auth/login", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify(credentials),
-    // });
-    // if (!response.ok) throw new Error("Email or password is incorrect.");
-    await delay(2000);
-    if(credentials.email===DUMMY_EMAIL 
-      && credentials.password===DUMMY_PASSWORD) return;
-    throw new Error("Email or Password is incorrect");
+  try {
+    const response = await fetch(LOGIN_ENDPOINT, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(credentials),
+    });
 
+    if (!response.ok) {
+      const body = (await response.json().catch(() => null)) as { message?: string } | null;
+      throw new Error(body?.message ?? LOGIN_FAILED_MESSAGE);
+    }
   } catch (error) {
-    if (error instanceof Error) throw error; 
-    throw new Error("unidentified error occured !!!!",{cause: error});
+    if (error instanceof Error) throw error;
+    throw new Error(UNKNOWN_ERROR_MESSAGE, { cause: error });
   }
 }
 
+//TODO: NOT WORK FOR NOW BECAUSE WE DON'T HAVE API ENDPOINT
 export async function resetPassword(email: string): Promise<boolean> {
-  // TODO Use real API
   const response = await fetch("/api/auth/forgot-password", {
     method: "POST",
     headers: {
