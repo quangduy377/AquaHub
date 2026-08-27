@@ -1,24 +1,41 @@
 import { useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import AquariumCard from "../components/AquariumCard";
 import { aquariums } from "../data/aquariumData";
 import { type AquariumType, type Aquarium, Action } from "../types/aquarium";
 import { ALL, AQUARIUM_TYPES } from "../types/aquarium";
 import AquariumModal from "../components/AquariumModal";
 import styles from "./AquariumListPage.module.css";
-
+import { logOut } from "../../auth/services/authService";
+import {ROUTES} from "../../../routes/AquaRoutes";
 const generateRandomId = (): number => {
   return Math.floor(Math.random() * 1_000_000);
 };
 
 function AquariumListPage() {
+  const navigate = useNavigate();
   const {email} = useParams<{email:string}>();
+  const userName = email!.replace("@gmail.com","");
   const [selectedType, setSelectedType] = useState<AquariumType>(ALL);
   const [filteredAquariums, setFilteredAquarium] =
     useState<Aquarium[]>(aquariums);
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
   const [selectedAquarium, setSelectedAquarium] = useState<Aquarium | null>(null);
+  const [isUserDropDownOpen, setUserDropDownOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
+
+  async function handleSignOut(): Promise<void> {
+    try{
+      await logOut();
+      navigate(ROUTES.LOGIN, { replace: true });
+    }
+    catch(err){
+      //TODO: should make use of this error
+      if (err instanceof Error) {
+        console.error(err.message);
+      }
+    }
+  }
 
   function openAquariumDetail(aquarium: Aquarium) {
     setSelectedAquarium(aquarium);
@@ -123,15 +140,37 @@ function AquariumListPage() {
       <section className={styles.hero}>
         <div>
           <span className={styles.eyebrow}>AquaHub Dashboard</span>
-          <h1>{`${email} 's Aquariums`}</h1>
+          <h1>{`${userName} 's Aquariums`}</h1>
           <p>
             Track your aquariums and keep an eye on important water parameters.
           </p>
         </div>
 
-        <button className={styles.primaryButton} type="button" onClick={openForm}>
-          + Add aquarium
-        </button>
+        <div className={styles.heroActions}>
+          <button className={styles.primaryButton} type="button" onClick={openForm}>
+            + Add aquarium
+          </button>
+          <div className={styles.userMenu}>
+            <button
+              className={styles.userMenuButton}
+              type="button"
+              aria-expanded={isUserDropDownOpen}
+              aria-haspopup="menu"
+              onClick={() => setUserDropDownOpen((current) => !current)}>
+              {userName} <span aria-hidden="true">▾</span>
+            </button>
+
+            {isUserDropDownOpen && (
+              <div className={styles.dropdownMenu} role="menu">
+                <button type="button" role="menuitem">Profile</button>
+                <button type="button" role="menuitem">Settings</button>
+                <button type="button" role="menuitem" onClick={()=>void handleSignOut()}>
+                  Sign out
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       </section>
 
       {isAddFormOpen && (

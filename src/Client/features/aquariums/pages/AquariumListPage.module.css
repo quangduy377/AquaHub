@@ -1,5 +1,12 @@
 .page { width: min(1180px, calc(100% - 40px)); margin: 0 auto; padding: 56px 0 80px; text-align: left; }
 .hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 36px; }
+.heroActions { display: flex; flex-shrink: 0; align-items: center; gap: 12px; }
+.userMenu { position: relative; }
+.userMenuButton { border: 1px solid #bdd3cf; border-radius: 12px; padding: 13px 15px; color: #176f61; background: white; font-weight: 700; }
+.userMenuButton:hover { background: #edf7f4; }
+.dropdownMenu { position: absolute; z-index: 2; top: calc(100% + 8px); right: 0; min-width: 160px; border: 1px solid #dbe8e5; border-radius: 12px; padding: 6px; background: white; box-shadow: 0 14px 30px rgb(30 70 65 / 14%); }
+.dropdownMenu button { display: block; width: 100%; border: 0; border-radius: 8px; padding: 10px 12px; color: #244541; background: transparent; text-align: left; }
+.dropdownMenu button:hover { background: #edf7f4; color: #176f61; }
 .eyebrow { display: block; margin-bottom: 8px; color: #16836f; font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 .hero h1 { margin: 0; color: #153b38; font-size: clamp(36px, 5vw, 56px); letter-spacing: -.04em; }
 .hero p { max-width: 620px; margin: 14px 0 0; color: #607573; font-size: 17px; line-height: 1.7; }
@@ -26,6 +33,8 @@
 @media (max-width: 650px) {
   .page { width: min(100% - 28px, 1180px); padding-top: 32px; }
   .hero { align-items: stretch; flex-direction: column; }
-  .primaryButton { width: 100%; }
+  .heroActions { align-items: stretch; flex-direction: column; }
+  .userMenuButton, .primaryButton { width: 100%; }
+  .dropdownMenu { right: 0; left: 0; }
   .filterPanel, .grid { grid-template-columns: 1fr; }
 }

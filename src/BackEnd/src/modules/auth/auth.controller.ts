@@ -32,6 +32,6 @@ export async function currentUser(request: Request, response: Response): Promise
 }
 
 export function logoutUser(_request: Request, response: Response): void {
-  response.clearCookie(AUTH_COOKIE_NAME, cookieOptions);
+  response.clearCookie(AUTH_COOKIE_NAME, {...cookieOptions, maxAge: 0});
   response.status(HTTP_STATUS.NO_CONTENT).send();
 }
