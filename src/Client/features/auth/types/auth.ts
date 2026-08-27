@@ -3,6 +3,13 @@ export interface LoginCredentials {
   password: string;
 }
 
+//MUST MATCH WITH THE 
+export interface AuthenticatedUser {
+  id: string;
+  email: string;
+  createdAt: string;
+}
+
 export type LoginHandler = (
   credentials: LoginCredentials,
 ) => Promise<boolean>;

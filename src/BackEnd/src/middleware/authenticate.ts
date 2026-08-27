@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { env } from "../config/env.js";
+import { AUTH_COOKIE_NAME } from "../constants/auth.js";
 import { HTTP_STATUS } from "../constants/httpStatus.js";
 import { AppError } from "../utils/AppError.js";
 
@@ -15,7 +16,7 @@ interface AccessTokenPayload extends jwt.JwtPayload {
 }
 
 export function authenticate(request: Request, _ : Response, next: NextFunction): void {
-  const token = request.cookies?.accessToken as string | undefined;
+  const token = request.cookies?.[AUTH_COOKIE_NAME] as string | undefined;
   if (!token) {
     next(
       new AppError(

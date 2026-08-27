@@ -1,7 +1,7 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import styles from "./LoginPage.module.css";
 import CustomButton from "../../../CustomButton/CustomButton";
-import { login, resetPassword } from "../services/authService";
+import { getCurrentUser, login, resetPassword } from "../services/authService";
 import { useNavigate } from "react-router-dom";
 import { PARAM_ROUTES } from "../../../routes/AquaRoutes";
 
@@ -46,6 +46,29 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [loginError, setLoginError] = useState<string | null >(null);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function checkSession() {
+      try {
+        const user = await getCurrentUser(controller.signal);
+
+        if (user) {
+          navigate(PARAM_ROUTES.AQUARIUMS(user.email), { replace: true });
+          return;
+        }
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+      }
+
+      setIsCheckingSession(false);
+    }
+
+    void checkSession();
+    return () => controller.abort();
+  }, [navigate]);
                  
   const isLoginView = view === LOGIN_VIEW;
   const btnMsgAfterLoading:string = isLoginView ? SingIn : SendResetInstruction;
@@ -113,6 +136,14 @@ export default function LoginPage() {
     setSuccessMessage("");
     setPassword("");
     setShowPassword(false);
+  }
+
+  if (isCheckingSession) {
+    return (
+      <main className={styles.page} aria-busy="true">
+        <p role="status">Checking your session...</p>
+      </main>
+    );
   }
 
   return (

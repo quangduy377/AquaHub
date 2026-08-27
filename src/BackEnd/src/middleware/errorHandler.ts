@@ -8,7 +8,7 @@ const ERROR_MESSAGES = {
   INTERNAL_SERVER_ERROR: "Internal server error",
 } as const;
 
-export const errorHandler: ErrorRequestHandler = (error, _request, response) => {
+export const errorHandler: ErrorRequestHandler = (error, __, response, ___) => {
   if (error instanceof ZodError) {
     response.status(HTTP_STATUS.BAD_REQUEST).json({
       message: ERROR_MESSAGES.INVALID_REQUEST_DATA,
@@ -18,11 +18,11 @@ export const errorHandler: ErrorRequestHandler = (error, _request, response) => 
   }
 
   if (error instanceof AppError) {
+    console.log(error.message, error.statusCode);
     response.status(error.statusCode).json({ message: error.message });
     return;
   }
 
-  console.error(error);
   response.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
     message: ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
   });
