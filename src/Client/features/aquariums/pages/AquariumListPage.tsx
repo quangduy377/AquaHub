@@ -1,12 +1,13 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AquariumCard from "../components/AquariumCard";
 import { aquariums } from "../data/aquariumData";
-import { type AquariumType, type Aquarium, Action } from "../types/aquarium";
+import { type AquariumType, type Aquarium, Action, type AquariumPayload } from "../types/aquarium";
 import { ALL, AQUARIUM_TYPES } from "../types/aquarium";
 import AquariumModal from "../components/AquariumModal";
 import styles from "./AquariumListPage.module.css";
 import { logOut } from "../../auth/services/authService";
+import { getExistingAquas, addAqua, updateAqua } from "../../auth/services/aquaService";
 import {ROUTES} from "../../../routes/AquaRoutes";
 const generateRandomId = (): number => {
   return Math.floor(Math.random() * 1_000_000);
@@ -18,11 +19,29 @@ function AquariumListPage() {
   const userName = email!.replace("@gmail.com","");
   const [selectedType, setSelectedType] = useState<AquariumType>(ALL);
   const [filteredAquariums, setFilteredAquarium] =
-    useState<Aquarium[]>(aquariums);
+    useState<Aquarium[]>([]);
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
   const [selectedAquarium, setSelectedAquarium] = useState<Aquarium | null>(null);
   const [isUserDropDownOpen, setUserDropDownOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
+
+  useEffect(()=>{
+    async function getAquas(){
+      let aquas: Aquarium[];
+      try{
+        aquas = await getExistingAquas();
+      }
+      catch(err){
+        if(err instanceof Error){
+          //TODO: Add error here
+          console.log(err.message);
+        }
+        aquas = [];
+      }
+      setFilteredAquarium(aquas);
+    }
+    getAquas();
+  },[])
 
   async function handleSignOut(): Promise<void> {
     try{
@@ -67,18 +86,18 @@ function AquariumListPage() {
     setFilteredAquarium(filteredAquariums);
   }
 
-  function onUpdateAquarium(
+  async function onUpdateAquarium(
     name: string,
     selectedTypeInAdd: AquariumType,
     volumeValue: number,
     pHValue: number,
     gHValue: number,
-    tdsValue: number,): boolean{
+    tdsValue: number,): Promise<boolean>{
       if(!name || !selectedTypeInAdd || !volumeValue ||
       !pHValue || !gHValue || !tdsValue) return false;
 
-      const newAqua: Aquarium = {
-        id: selectedAquarium!.id,
+      const payload: AquariumPayload = {
+        aquariumId : selectedAquarium!.id,
         name : name,
         type: selectedTypeInAdd,
         volumeLitres: volumeValue,
@@ -86,26 +105,34 @@ function AquariumListPage() {
         gh: gHValue,
         tds: tdsValue
       }
-      setSelectedAquarium(newAqua);
-      setFilteredAquarium(prev=>{
-        const newAquas = [...prev];
-        const selectedAquaIndex = newAquas.findIndex(aqua => aqua.id === selectedAquarium!.id);
-        newAquas[selectedAquaIndex] = newAqua;
-        return newAquas;
-      });
-      return true;
+      try{
+        const updatedAqua = await updateAqua(payload);
+        if(!updatedAqua) return false;
+        setSelectedAquarium(updatedAqua);
+        setFilteredAquarium(prev=>{
+          const newAquas = [...prev];
+          const selectedAquaIndex = newAquas.findIndex(aqua => aqua.id === selectedAquarium!.id);
+          newAquas[selectedAquaIndex] = updatedAqua;
+          return newAquas;
+        });
+        return true;
+      }
+      catch(err){
+        //TODO: Do something with the error
+        return false;
+      }
   }
 
 
 
-  function onAddAquarium(
+  async function onAddAquarium(
     name: string,
     selectedTypeInAdd: AquariumType,
     volumeValue: string,
     pHValue: string,
     gHValue: string,
     tdsValue: string,
-  ): boolean {
+  ): Promise<boolean> {
     if (
       !name ||
       !selectedTypeInAdd ||
@@ -116,12 +143,10 @@ function AquariumListPage() {
     ) {
       return false;
     }
-
     const volumn = Number(volumeValue);
     const pH = Number(pHValue);
     const gH = Number(gHValue);
     const tds = Number(tdsValue);
-
     const newAqua: Aquarium = {
       id: generateRandomId(),
       name: name,
@@ -131,8 +156,17 @@ function AquariumListPage() {
       gh: gH,
       tds: tds,
     };
-    setFilteredAquarium((prevAquas) => [...prevAquas, newAqua]);
-    return true;
+
+    try{
+      const success = await addAqua(newAqua) != null;
+      if(success) setFilteredAquarium((prevAquas) => [...prevAquas, newAqua]);
+      return success;
+    }
+    catch(err){
+      //TODO: Do something with the error
+      console.log("add aqua FAILED");
+      return false;
+    }
   }
 
   return (

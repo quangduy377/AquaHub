@@ -19,6 +19,16 @@ export type AquariumType =
   | typeof NEOCARIDINA
   | typeof COMMUNITY_FISH;
 
+export type AquariumPayload = {
+  aquariumId: number;
+  name: string;
+  type: AquariumType;
+  volumeLitres: number;
+  ph: number;
+  gh: number;
+  tds: number;
+};
+
 export interface Aquarium {
   id: number;
   name: string;
@@ -44,7 +54,7 @@ type AddModalProps = {
     ph: string,
     gh: string,
     tds: string,
-  ) => boolean;
+  ) => Promise<boolean>;
 };
 
 type ViewModalProps = {
@@ -58,7 +68,7 @@ type ViewModalProps = {
     ph: number,
     gh: number,
     tds: number,
-  ) => boolean;
+  ) => Promise<boolean>;
 };
 
 export type AquariumModalProps = AddModalProps | ViewModalProps;

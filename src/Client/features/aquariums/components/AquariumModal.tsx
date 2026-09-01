@@ -46,7 +46,7 @@ export default function AquariumModal(props: AquariumModalProps) {
     setIsEdit(true);
   }
 
-  function onSaveAddAquarium(): void {
+  async function onSaveAddAquarium(): Promise<void> {
     const name = nameRef.current?.value.trim() ?? "";
     if(name==="") setIsNameEmpty(true);
     if(selectedTypeInAdd === ALL) setSelectedTypeInAdd(undefined); 
@@ -58,10 +58,9 @@ export default function AquariumModal(props: AquariumModalProps) {
     if(gHValue==="") setIsGhEmpty(true);
     const tdsValue = TDSRef.current?.value.trim() ?? "";
     if(tdsValue==="") setIsTDSEmpty(true);
-    console.log(selectedTypeInAdd); //TODO: Bug
     if(!name || selectedTypeInAdd === ALL || !volumeValue || !pHValue || !gHValue || !tdsValue) return;
 
-    if(props.mode === Action.ADD && props.onAddAquarium(
+    if(props.mode === Action.ADD && await props.onAddAquarium(
         name,
         selectedTypeInAdd!,
         volumeValue,
@@ -72,7 +71,7 @@ export default function AquariumModal(props: AquariumModalProps) {
       props.closeForm();
     }
 
-    else if(props.mode === Action.VIEW && isEdit && props.onUpdateAquarium(name,
+    else if(props.mode === Action.VIEW && isEdit && await props.onUpdateAquarium(name,
         selectedTypeInAdd!,
         Number(volumeValue),
         Number(pHValue),
@@ -125,10 +124,10 @@ export default function AquariumModal(props: AquariumModalProps) {
 
         <form
           className={styles.form}
-          onSubmit={(event) => {
+          onSubmit={async (event) => {
             event.preventDefault();
             if(props.mode === Action.ADD || isEdit){
-              onSaveAddAquarium();
+              await onSaveAddAquarium();
             }
             else{
               enterEditMode();
