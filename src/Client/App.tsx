@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import AquariumListPage from "./features/aquariums/pages/AquariumListPage";
 import LoginPage from "./features/auth/pages/LoginPage";
+import AquariumWaterQualityPage from "./features/aquariums/pages/AquariumWaterQualityPage";
 import { ROUTES } from "./routes/AquaRoutes";
 function App() {
   return (
@@ -9,6 +10,8 @@ function App() {
       <Route path={ROUTES.AQUARIUMS} element={<AquariumListPage />} />
       <Route path={ROUTES.HOME} element={<Navigate to={ROUTES.LOGIN} replace />} />
       <Route path="*" element={<Navigate to={ROUTES.LOGIN} replace />} />
+      <Route path={"TEST"} element={<AquariumWaterQualityPage />} />
+
     </Routes>
   )
 }
