@@ -4,8 +4,10 @@ import { formatDate } from "../../../utils/dateUtils";
 import type { HistoryFilter, ChartParameter, WaterReading, Aquarium } from "../types/aquarium";
 import { parameterMeta } from "../types/aquarium";
 import { getReadingStatus, getParameterStatus } from "../../../utils/statusUtils";
-import ParameterChart from "../components/ParameterChart";
+// import ParameterChart from "../components/ParameterChart";
 import WaterQualityInputModal from "../components/WaterQualityInputModal";
+import Chart from "../components/Chart";
+import ParameterChart from "../components/ParameterChart";
 
 
 //TODO: Remove later once we can get aquariums through API endpoints
@@ -139,30 +141,12 @@ function AquariumWaterQuality() {
           <span className={styles.chartLegend}><i /> Oldest to newest</span>
         </div>
         <div className={styles.chartGrid}>
-          {chartMeta.map(({ key, label, formula, unit, color }) => {
-            const currentValue = latest?.[key];
-            const previousValue = aquariumReadings[1]?.[key];
-            const difference = currentValue !== undefined && previousValue !== undefined
-              ? Number((currentValue - previousValue).toFixed(2))
-              : null;
 
+          {chartMeta.map((prop) => {
             return (
-              <article className={styles.chartCard} key={key}>
-                <div className={styles.chartHeader}>
-                  <div><span>{label}</span><h3 style={{ color }}>{formula}</h3></div>
-                  <div className={styles.chartCurrent}>
-                    <strong>{currentValue ?? "--"} <small>{unit}</small></strong>
-                    {difference !== null && (
-                      <span className={difference > 0 ? styles.trendUp : difference < 0 ? styles.trendDown : styles.trendStable}>
-                        {difference > 0 ? "+" : difference < 0 ? "-" : ""}{Math.abs(difference)} since last
-                      </span>
-                    )}
-                  </div>
-                </div>
-                {aquariumReadings.length > 0
-                  ? <ParameterChart readings={aquariumReadings} parameter={key} color={color} unit={unit} />
-                  : <div className={styles.chartEmpty}>Add a test to start this chart.</div>}
-              </article>
+              <Chart readings={aquariumReadings}
+                key={prop.key}
+                config={prop} />
             );
           })}
         </div>
