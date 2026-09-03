@@ -1,0 +1,36 @@
+.chartBody {
+  margin-top: 15px;
+}
+
+.chartBody svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 190px;
+  overflow: visible;
+}
+
+.gridLine {
+  stroke: #e4ecea;
+  stroke-width: 1;
+  stroke-dasharray: 4 5;
+}
+
+.axisLine,
+.tickMark {
+  stroke: #9badab;
+  stroke-width: 1;
+}
+
+.axisTick {
+  fill: #82938f;
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.axisTitle {
+  fill: #607773;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: .02em;
+}

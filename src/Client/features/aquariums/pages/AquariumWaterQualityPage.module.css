@@ -54,12 +54,6 @@
 .trendUp { color: #c47a0c !important; }
 .trendDown { color: #16836f !important; }
 .trendStable { color: #718582 !important; }
-.chartBody { margin-top: 15px; }
-.chartBody svg { display: block; width: 100%; height: auto; min-height: 190px; overflow: visible; }
-.gridLine { stroke: #e4ecea; stroke-width: 1; stroke-dasharray: 4 5; }
-.axisLine, .tickMark { stroke: #9badab; stroke-width: 1; }
-.axisTick { fill: #82938f; font-size: 8px; font-weight: 600; }
-.axisTitle { fill: #607773; font-size: 9px; font-weight: 750; letter-spacing: .02em; }
 .chartEmpty { display: grid; min-height: 170px; place-items: center; color: #81918f; font-size: 13px; }
 .filters { display: flex; gap: 5px; border: 1px solid #d8e6e3; border-radius: 11px; padding: 4px; background: #fff; }
 .filters button { border: 0; border-radius: 8px; padding: 7px 11px; color: #627874; background: transparent; font-size: 12px; font-weight: 700; }
@@ -76,7 +70,7 @@
 .emptyState { padding: 45px 20px; color: #70827f; text-align: center; }
 .backdrop { position: fixed; z-index: 10; inset: 0; display: grid; overflow-y: auto; place-items: center; padding: 22px; background: rgb(13 42 39 / 58%); backdrop-filter: blur(4px); }
 .modal { width: min(680px, 100%); max-height: calc(100vh - 44px); overflow-y: auto; border: 1px solid #d6e5e2; border-radius: 22px; padding: 27px; background: #fff; box-shadow: 0 30px 80px rgb(8 39 35 / 28%); }
-.modalHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; padding-bottom: 20px; border-bottom: 1px solid #e1ebe9; }
+.modalHeader { display: flex; flex-direction: row; align-items: flex-start; justify-content: space-between; gap: 24px; padding-bottom: 20px; border-bottom: 1px solid #e1ebe9; }
 .modalHeader h2 { margin: 0; color: #173d39; font-size: 25px; }
 .modalHeader p { font-size: 14px; }
 .closeButton { display: grid; width: 38px; height: 38px; flex-shrink: 0; place-items: center; border: 1px solid #d6e3e1; border-radius: 50%; padding: 0; color: #54706c; background: #f5f9f8; font-size: 25px; }

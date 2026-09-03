@@ -72,3 +72,41 @@ type ViewModalProps = {
 };
 
 export type AquariumModalProps = AddModalProps | ViewModalProps;
+
+export type WaterStatus = "Good" | "Attention" | "Critical";
+export type HistoryFilter = "All" | WaterStatus;
+export type ChartParameter = "ammonia" | "nitrite" | "nitrate" | "ph" | "tds";
+export type WaterReading = {
+  id: number;
+  recordedAt: string;
+  ph: number;
+  temperature: number;
+  ammonia: number;
+  nitrite: number;
+  nitrate: number;
+  gh: number;
+  kh: number;
+  tds: number;
+  note: string;
+};
+
+
+export type ReadingForm = Omit<WaterReading, "id" | "recordedAt">;
+
+export type ParameterMeta = {
+  key: keyof (Omit<ReadingForm, "note">);
+  label: string;
+  unit: string;
+  ideal: string;
+}
+
+export const parameterMeta: ParameterMeta[] = [
+  { key: "ph", label: "pH", unit: "", ideal: "6.5–7.5" },
+  { key: "temperature", label: "Temperature", unit: "°C", ideal: "23–27 °C" },
+  { key: "ammonia", label: "Ammonia", unit: "ppm", ideal: "0 ppm" },
+  { key: "nitrite", label: "Nitrite", unit: "ppm", ideal: "0 ppm" },
+  { key: "nitrate", label: "Nitrate", unit: "ppm", ideal: "< 20 ppm" },
+  { key: "gh", label: "GH", unit: "dGH", ideal: "4–8 dGH" },
+  { key: "kh", label: "KH", unit: "dKH", ideal: "3–6 dKH" },
+  { key: "tds", label: "TDS", unit: "ppm", ideal: "120–220 ppm" },
+] as const;
