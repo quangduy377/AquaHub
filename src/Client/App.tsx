@@ -10,8 +10,7 @@ function App() {
       <Route path={ROUTES.AQUARIUMS} element={<AquariumListPage />} />
       <Route path={ROUTES.HOME} element={<Navigate to={ROUTES.LOGIN} replace />} />
       <Route path="*" element={<Navigate to={ROUTES.LOGIN} replace />} />
-      <Route path={"TEST"} element={<AquariumWaterQualityPage />} />
-
+      <Route path={ROUTES.AQUARIUM_WATER_QUALITY} element={<AquariumWaterQualityPage />} />
     </Routes>
   )
 }

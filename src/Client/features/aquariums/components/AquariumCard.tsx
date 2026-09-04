@@ -1,14 +1,17 @@
 import type { Aquarium } from "../types/aquarium";
 import styles from "./AquariumCard.module.css";
-
+import { useNavigate } from "react-router-dom";
+import { PARAM_ROUTES } from "../../../routes/AquaRoutes";
 interface AquariumCardProps {
   aquarium: Aquarium;
   onViewDetails: (aquarium: Aquarium) => void;
 }
 
 function AquariumCard({ aquarium, onViewDetails }: AquariumCardProps) {
+  const navigate = useNavigate();
+  const { AQUARIUM_WATER_QUALITY } = PARAM_ROUTES;
   return (
-    <article className={styles.card}>
+    <article className={styles.card} onClick={() => onViewDetails(aquarium)}>
       <div className={styles.header}>
         <div>
           <span className={styles.label}>Aquarium</span>
@@ -40,10 +43,12 @@ function AquariumCard({ aquarium, onViewDetails }: AquariumCardProps) {
         </div>
       </div>
 
-      <button className={styles.button} type="button" onClick={()=>{
-        onViewDetails(aquarium);
+      <button className={styles.button} type="button" onClick={() => {
+        //TODO: How to get user-email ????, still hard coded
+        console.log(aquarium);
+        navigate(AQUARIUM_WATER_QUALITY.URL("quangduy377@gmail.com", aquarium.id));
       }}>
-        View details
+        View Water Quality
       </button>
     </article>
   );

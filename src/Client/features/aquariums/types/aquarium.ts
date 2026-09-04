@@ -110,3 +110,11 @@ export const parameterMeta: ParameterMeta[] = [
   { key: "kh", label: "KH", unit: "dKH", ideal: "3–6 dKH" },
   { key: "tds", label: "TDS", unit: "ppm", ideal: "120–220 ppm" },
 ] as const;
+
+export const chartMeta: { key: ChartParameter; label: string; formula: string; unit: string; color: string }[] = [
+  { key: "ammonia", label: "Ammonia", formula: "NH3", unit: "ppm", color: "#d97706" },
+  { key: "nitrite", label: "Nitrite", formula: "NO2", unit: "ppm", color: "#dc5a65" },
+  { key: "nitrate", label: "Nitrate", formula: "NO3", unit: "ppm", color: "#8b5cf6" },
+  { key: "ph", label: "Acidity", formula: "pH", unit: "", color: "#16836f" },
+  { key: "tds", label: "Total dissolved solids", formula: "TDS", unit: "ppm", color: "#2081c3" },
+] as const;

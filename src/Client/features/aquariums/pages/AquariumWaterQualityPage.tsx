@@ -1,20 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./AquariumWaterQualityPage.module.css";
 import { formatDate } from "../../../utils/dateUtils";
-import type { HistoryFilter, ChartParameter, WaterReading, Aquarium } from "../types/aquarium";
-import { parameterMeta } from "../types/aquarium";
+import type { HistoryFilter, WaterReading, Aquarium } from "../types/aquarium";
+import { parameterMeta, chartMeta } from "../types/aquarium";
 import { getReadingStatus } from "../../../utils/statusUtils";
 import WaterQualityInputModal from "../components/WaterQualityInputModal";
 import Chart from "../components/Chart";
 import ParameterCard from "../components/ParameterCard";
 import TestHistoryTable from "../components/TestHistoryTable";
-
-
-//TODO: Remove later once we can get aquariums through API endpoints
-const aquariums: Aquarium[] = [
-  { id: 1, name: "Living Room Planted", type: "Planted", volumeLitres: 120, ph: 5, gh: 5, tds: 100 },
-  { id: 2, name: "Crystal Shrimp", type: "Caridina", volumeLitres: 45, ph: 5, gh: 5, tds: 100 },
-];
+import { getExistingAquas } from "../../auth/services/aquaService";
+import { useParams } from "react-router-dom";
+import { PARAM_ROUTES } from "../../../routes/AquaRoutes";
 
 //TODO: Remove this later, not needed
 const initialReadings: Record<number, WaterReading[]> = {
@@ -29,24 +25,39 @@ const initialReadings: Record<number, WaterReading[]> = {
 };
 
 
-const chartMeta: { key: ChartParameter; label: string; formula: string; unit: string; color: string }[] = [
-  { key: "ammonia", label: "Ammonia", formula: "NH3", unit: "ppm", color: "#d97706" },
-  { key: "nitrite", label: "Nitrite", formula: "NO2", unit: "ppm", color: "#dc5a65" },
-  { key: "nitrate", label: "Nitrate", formula: "NO3", unit: "ppm", color: "#8b5cf6" },
-  { key: "ph", label: "Acidity", formula: "pH", unit: "", color: "#16836f" },
-  { key: "tds", label: "Total dissolved solids", formula: "TDS", unit: "ppm", color: "#2081c3" },
-];
-
 
 function AquariumWaterQuality() {
-  const [selectedAquariumId, setSelectedAquariumId] = useState(1);
+  const params = useParams();
+  const { AQUARIUM_WATER_QUALITY } = PARAM_ROUTES;
+  // const email = params[AQUARIUM_WATER_QUALITY.EmailParamKey];
+  const aquariumId = Number(params[AQUARIUM_WATER_QUALITY.AquariumIdParamKey]);
+  const [selectedAquariumId, setSelectedAquariumId] = useState(aquariumId);
   const [readings, setReadings] = useState(initialReadings);
   const [historyFilter, setHistoryFilter] = useState<HistoryFilter>("All");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
+  const [aquarium, setAquarium] = useState<Aquarium | null>(null);
+  const [aquariums, setAquariums] = useState<Aquarium[]>([]);
+  //
+  // let aquarium: Aquarium;
+  useEffect(() => {
+    //TODO: Fetch aquariums
+    async function fetchData() {
+      try {
+        const aquariums = await getExistingAquas();
+        setAquariums(aquariums);
+        const aquarium = aquariums.find((item) => item.id === selectedAquariumId) ?? aquariums[0];
+        setAquarium(aquarium);
+        //TODO: setReadings
+        //
+      }
+      catch (err) {
+        //TODO: Do something
+      }
+    }
+    fetchData();
+  }, []);
 
-  //TODO: Get aquariums from the API endpoint
-  const aquarium = aquariums.find((item) => item.id === selectedAquariumId) ?? aquariums[0];
   const aquariumReadings = readings[selectedAquariumId] ?? [];
   const latest = aquariumReadings[0];
   const latestStatus = latest ? getReadingStatus(parameterMeta, latest) : "Attention";
@@ -97,9 +108,9 @@ function AquariumWaterQuality() {
         <div className={styles.tankSummary}>
           <div className={styles.tankIcon} aria-hidden="true">◌</div>
           <div>
-            <span className={styles.mutedLabel}>{aquarium.type} aquarium</span>
-            <h2>{aquarium.name}</h2>
-            <p>{aquarium.volumeLitres} litres · {aquariumReadings.length} recorded tests</p>
+            <span className={styles.mutedLabel}>{aquarium?.type} aquarium</span>
+            <h2>{aquarium?.name}</h2>
+            <p>{aquarium?.volumeLitres} litres · {aquariumReadings.length} recorded tests</p>
           </div>
         </div>
         <div className={`${styles.healthSummary} ${styles[latestStatus.toLowerCase()]}`}>
@@ -156,7 +167,7 @@ function AquariumWaterQuality() {
       </section>
 
       {isFormOpen &&
-        <WaterQualityInputModal aquarium={aquarium}
+        <WaterQualityInputModal aquarium={aquarium!}
           submitReading={submitReading}
           closeForm={() => setIsFormOpen(false)} />
       }
