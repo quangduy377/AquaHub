@@ -3,11 +3,11 @@ import styles from "./AquariumWaterQualityPage.module.css";
 import { formatDate } from "../../../utils/dateUtils";
 import type { HistoryFilter, ChartParameter, WaterReading, Aquarium } from "../types/aquarium";
 import { parameterMeta } from "../types/aquarium";
-import { getReadingStatus, getParameterStatus } from "../../../utils/statusUtils";
-// import ParameterChart from "../components/ParameterChart";
+import { getReadingStatus } from "../../../utils/statusUtils";
 import WaterQualityInputModal from "../components/WaterQualityInputModal";
 import Chart from "../components/Chart";
-import ParameterChart from "../components/ParameterChart";
+import ParameterCard from "../components/ParameterCard";
+import TestHistoryTable from "../components/TestHistoryTable";
 
 
 //TODO: Remove later once we can get aquariums through API endpoints
@@ -55,7 +55,6 @@ function AquariumWaterQuality() {
   );
 
   function submitReading(newReading: WaterReading): void {
-    console.log("new reading", newReading);
     setReadings((current) => ({
       ...current,
       [selectedAquariumId]: [newReading, ...(current[selectedAquariumId] ?? [])],
@@ -121,16 +120,7 @@ function AquariumWaterQuality() {
 
         {latest ? (
           <div className={styles.parameterGrid}>
-            {parameterMeta.map(({ key, label, unit, ideal }) => {
-              const status = getParameterStatus(key, latest[key]);
-              return (
-                <article className={styles.parameterCard} key={key}>
-                  <div className={styles.parameterHeader}><span>{label}</span><i className={`${styles.miniDot} ${styles[status.toLowerCase()]}`} /></div>
-                  <div className={styles.parameterValue}>{latest[key]} <small>{unit}</small></div>
-                  <div className={styles.parameterFooter}><span>Ideal {ideal}</span><strong className={styles[status.toLowerCase()]}>{status}</strong></div>
-                </article>
-              );
-            })}
+            {parameterMeta.map(el => <ParameterCard reading={latest} parameterInfo={el} />)}
           </div>
         ) : <div className={styles.emptyState}>No readings yet. Add a water test to get started.</div>}
       </section>
@@ -142,13 +132,9 @@ function AquariumWaterQuality() {
         </div>
         <div className={styles.chartGrid}>
 
-          {chartMeta.map((prop) => {
-            return (
-              <Chart readings={aquariumReadings}
-                key={prop.key}
-                config={prop} />
-            );
-          })}
+          {chartMeta.map(prop => <Chart readings={aquariumReadings}
+            key={prop.key}
+            config={prop} />)}
         </div>
       </section>
 
@@ -163,20 +149,9 @@ function AquariumWaterQuality() {
         </div>
 
         <div className={styles.tableWrap}>
-          {filteredHistory.length > 0 ? (
-            <table>
-              <thead><tr><th>Date</th><th>Status</th><th>pH</th><th>Temp.</th><th>NH₃</th><th>NO₂</th><th>NO₃</th><th>TDS</th><th>Note</th></tr></thead>
-              <tbody>{filteredHistory.map((reading) => {
-                const status = getReadingStatus(parameterMeta, reading);
-                return <tr key={reading.id}>
-                  <td>{formatDate(reading.recordedAt)}</td>
-                  <td><span className={`${styles.statusBadge} ${styles[status.toLowerCase()]}`}><i />{status}</span></td>
-                  <td>{reading.ph}</td><td>{reading.temperature}°</td><td>{reading.ammonia}</td><td>{reading.nitrite}</td><td>{reading.nitrate}</td><td>{reading.tds}</td>
-                  <td className={styles.noteCell}>{reading.note || "—"}</td>
-                </tr>;
-              })}</tbody>
-            </table>
-          ) : <div className={styles.emptyState}>No tests match this filter.</div>}
+          {filteredHistory.length > 0 ?
+            <TestHistoryTable history={filteredHistory} />
+            : <div className={styles.emptyState}>No tests match this filter.</div>}
         </div>
       </section>
 

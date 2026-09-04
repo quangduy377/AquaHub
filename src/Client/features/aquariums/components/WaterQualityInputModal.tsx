@@ -1,22 +1,13 @@
 import styles from "./WaterQualityInputModal.module.css"
-import type { Aquarium, ParameterMeta, ReadingForm, WaterReading } from "../types/aquarium"
+import type { Aquarium, ReadingForm, WaterReading } from "../types/aquarium"
 import { useState } from "react";
+import { parameterMeta } from "../types/aquarium";
 
 interface WaterQualityInputProps {
     aquarium: Aquarium;
     submitReading: (newReading: WaterReading) => void;
     closeForm: () => void;
 }
-const parameterMeta: ParameterMeta[] = [
-    { key: "ph", label: "pH", unit: "", ideal: "6.5–7.5" },
-    { key: "temperature", label: "Temperature", unit: "°C", ideal: "23–27 °C" },
-    { key: "ammonia", label: "Ammonia", unit: "ppm", ideal: "0 ppm" },
-    { key: "nitrite", label: "Nitrite", unit: "ppm", ideal: "0 ppm" },
-    { key: "nitrate", label: "Nitrate", unit: "ppm", ideal: "< 20 ppm" },
-    { key: "gh", label: "GH", unit: "dGH", ideal: "4–8 dGH" },
-    { key: "kh", label: "KH", unit: "dKH", ideal: "3–6 dKH" },
-    { key: "tds", label: "TDS", unit: "ppm", ideal: "120–220 ppm" },
-] as const;
 
 const emptyForm: ReadingForm = {
     ph: 7,
