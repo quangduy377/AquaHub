@@ -1,12 +1,14 @@
 import { AppError } from "../../utils/AppError.js";
 import { HTTP_STATUS } from "../../constants/httpStatus.js";
 import type { CreateAquariumInput, UpdateAquariumInput } from "./aquarium.schema.js";
+import type { WaterQualityReading } from "./aquarium.types.js";
 import {
   deleteByIdAndOwner,
   findAllByOwner,
   findByIdAndOwner,
   insertAquarium,
   updateByIdAndOwner,
+  getWaterQualityReadingsById
 } from "./aquarium.repository.js";
 
 const GET_AQUARIUM_NOT_FOUND_MESSAGE = "Aquarium not found";
@@ -36,6 +38,10 @@ export async function deleteAquarium(id: string, ownerId: string): Promise<void>
   if (!(await deleteByIdAndOwner(id, ownerId))) {
     throw new AppError(HTTP_STATUS.NOT_FOUND, DELETE_AQUARIUM_NOT_FOUND_MESSAGE);
   }
+}
+
+export async function getWaterQualityReadings(aquariumId: string): Promise<WaterQualityReading[]>{
+  return await getWaterQualityReadingsById(aquariumId);
 }
 
 export type { CreateAquariumInput };

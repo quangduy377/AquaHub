@@ -10,3 +10,16 @@ export interface Aquarium {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface WaterQualityReading {
+  id: string;
+  recordedAt: Date;
+  ph: number;
+  temperature: number;
+  ammonia: number;
+  nitrite: number;
+  nitrate: number;
+  gh: number;
+  tds: number;
+  note: string | null;
+}

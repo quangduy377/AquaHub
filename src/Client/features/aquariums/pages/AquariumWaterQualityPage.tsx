@@ -8,68 +8,58 @@ import WaterQualityInputModal from "../components/WaterQualityInputModal";
 import Chart from "../components/Chart";
 import ParameterCard from "../components/ParameterCard";
 import TestHistoryTable from "../components/TestHistoryTable";
-import { getExistingAquas } from "../../auth/services/aquaService";
+import { getExistingAquas, getWaterReadingsByAquariumId } from "../../auth/services/aquaService";
 import { useParams } from "react-router-dom";
 import { PARAM_ROUTES } from "../../../routes/AquaRoutes";
-
-//TODO: Remove this later, not needed
-const initialReadings: Record<number, WaterReading[]> = {
-  1: [
-    { id: 3, recordedAt: "2026-08-31T09:15:00", ph: 7.1, temperature: 25.2, ammonia: 0, nitrite: 0, nitrate: 12, gh: 7, kh: 4, tds: 178, note: "After weekly water change" },
-    { id: 2, recordedAt: "2026-08-28T18:30:00", ph: 7.3, temperature: 26.1, ammonia: 0, nitrite: 0.15, nitrate: 18, gh: 7, kh: 4, tds: 186, note: "Fed heavier than usual" },
-    { id: 1, recordedAt: "2026-08-24T10:00:00", ph: 7.2, temperature: 25.5, ammonia: 0, nitrite: 0, nitrate: 15, gh: 7, kh: 4, tds: 181, note: "Routine test" },
-  ],
-  2: [
-    { id: 4, recordedAt: "2026-08-30T11:20:00", ph: 6.5, temperature: 23.5, ammonia: 0, nitrite: 0, nitrate: 8, gh: 5, kh: 1, tds: 128, note: "Parameters stable" },
-  ],
-};
 
 
 
 function AquariumWaterQuality() {
   const params = useParams();
   const { AQUARIUM_WATER_QUALITY } = PARAM_ROUTES;
-  // const email = params[AQUARIUM_WATER_QUALITY.EmailParamKey];
-  const aquariumId = Number(params[AQUARIUM_WATER_QUALITY.AquariumIdParamKey]);
-  const [selectedAquariumId, setSelectedAquariumId] = useState(aquariumId);
-  const [readings, setReadings] = useState(initialReadings);
+  const aquariumId = params[AQUARIUM_WATER_QUALITY.AquariumIdParamKey]!;
+  const email = params[AQUARIUM_WATER_QUALITY.EmailParamKey]!;
+  const [selectedAquariumId, setSelectedAquariumId] = useState<string>(aquariumId!);
+  const [readings, setReadings] = useState<WaterReading[]>([]);
   const [historyFilter, setHistoryFilter] = useState<HistoryFilter>("All");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [aquarium, setAquarium] = useState<Aquarium | null>(null);
   const [aquariums, setAquariums] = useState<Aquarium[]>([]);
-  //
-  // let aquarium: Aquarium;
   useEffect(() => {
-    //TODO: Fetch aquariums
     async function fetchData() {
       try {
         const aquariums = await getExistingAquas();
         setAquariums(aquariums);
         const aquarium = aquariums.find((item) => item.id === selectedAquariumId) ?? aquariums[0];
         setAquarium(aquarium);
-        //TODO: setReadings
+        try {
+          console.log(selectedAquariumId);
+          const readings = await getWaterReadingsByAquariumId(email, selectedAquariumId);
+          setReadings(readings);
+        }
+        //Do nothing for now
+        catch (err) {
+          if (err instanceof Error) console.log(err.message);
+        }
+
         //
       }
-      catch (err) {
+      catch {
         //TODO: Do something
       }
     }
     fetchData();
-  }, []);
+  }, [selectedAquariumId]);
 
-  const aquariumReadings = readings[selectedAquariumId] ?? [];
-  const latest = aquariumReadings[0];
+  const latest = readings[0];
   const latestStatus = latest ? getReadingStatus(parameterMeta, latest) : "Attention";
-  const filteredHistory = aquariumReadings.filter(
+  const filteredHistory = readings.filter(
     (reading) => historyFilter === "All" || getReadingStatus(parameterMeta, reading) === historyFilter,
   );
 
   function submitReading(newReading: WaterReading): void {
-    setReadings((current) => ({
-      ...current,
-      [selectedAquariumId]: [newReading, ...(current[selectedAquariumId] ?? [])],
-    }));
+    setReadings(prev => [...prev, newReading]);
     setIsFormOpen(false);
     setSaveMessage("Water test saved successfully.");
   }
@@ -88,7 +78,8 @@ function AquariumWaterQuality() {
             <select
               value={selectedAquariumId}
               onChange={(event) => {
-                setSelectedAquariumId(Number(event.target.value));
+                console.log("aqua id client: ", event.target.value);
+                setSelectedAquariumId(event.target.value);
                 setHistoryFilter("All");
                 setSaveMessage("");
               }}
@@ -110,7 +101,7 @@ function AquariumWaterQuality() {
           <div>
             <span className={styles.mutedLabel}>{aquarium?.type} aquarium</span>
             <h2>{aquarium?.name}</h2>
-            <p>{aquarium?.volumeLitres} litres · {aquariumReadings.length} recorded tests</p>
+            <p>{aquarium?.volumeLitres} litres · {readings.length} recorded tests</p>
           </div>
         </div>
         <div className={`${styles.healthSummary} ${styles[latestStatus.toLowerCase()]}`}>
@@ -143,7 +134,7 @@ function AquariumWaterQuality() {
         </div>
         <div className={styles.chartGrid}>
 
-          {chartMeta.map(prop => <Chart readings={aquariumReadings}
+          {chartMeta.map(prop => <Chart readings={readings}
             key={prop.key}
             config={prop} />)}
         </div>

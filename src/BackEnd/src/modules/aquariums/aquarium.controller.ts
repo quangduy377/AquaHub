@@ -9,6 +9,7 @@ import {
   getAquarium,
   listAquariums,
   updateAquarium,
+  getWaterQualityReadings
 } from "./aquarium.service.js";
 
 const AUTHENTICATION_REQUIRED_MESSAGE = "Authentication required";
@@ -57,4 +58,9 @@ export async function update(request: Request, response: Response): Promise<void
 export async function remove(request: Request, response: Response): Promise<void> {
   await deleteAquarium(aquariumIdFrom(request), ownerIdFrom(request));
   response.status(HTTP_STATUS.NO_CONTENT).send();
+}
+
+export async function getWaterQuality(request: Request, response: Response){
+  const readings = await getWaterQualityReadings(aquariumIdFrom(request));
+  response.json({readings: readings});
 }

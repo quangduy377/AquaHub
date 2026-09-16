@@ -1,12 +1,15 @@
 import { Router } from "express";
 import { authenticate } from "../../middleware/authenticate.js";
 import { validateBody } from "../../middleware/validate.js";
-import { create, getOne, list, remove, update } from "./aquarium.controller.js";
+import { create, getOne, list, remove, update, getWaterQuality } from "./aquarium.controller.js";
 import { createAquariumSchema, updateAquariumSchema } from "./aquarium.schema.js";
+
+const BY_ID_ROUTE = "/:aquariumId";
 
 export const AQUARIUM_ROUTES = {
   ROOT: "/",
-  BY_ID: "/:aquariumId",
+  BY_ID: BY_ID_ROUTE,
+  BY_ID_TO_WATER_QUALITY: `/:email/:aquariumId/water-quality`
 } as const;
 
 export const aquariumRouter = Router();
@@ -21,3 +24,5 @@ aquariumRouter.patch(
   update,
 );
 aquariumRouter.delete(AQUARIUM_ROUTES.BY_ID, remove);
+aquariumRouter.get(AQUARIUM_ROUTES.BY_ID_TO_WATER_QUALITY, getWaterQuality);
+

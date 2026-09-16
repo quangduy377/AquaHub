@@ -45,7 +45,6 @@ function AquariumCard({ aquarium, onViewDetails }: AquariumCardProps) {
 
       <button className={styles.button} type="button" onClick={() => {
         //TODO: How to get user-email ????, still hard coded
-        console.log(aquarium);
         navigate(AQUARIUM_WATER_QUALITY.URL("quangduy377@gmail.com", aquarium.id));
       }}>
         View Water Quality

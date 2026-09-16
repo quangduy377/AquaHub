@@ -13,6 +13,6 @@ export const PARAM_ROUTES = {
   AQUARIUM_WATER_QUALITY : {
     EmailParamKey: "email",
     AquariumIdParamKey: "aquariumId",
-    URL: (email: string, aquariumId:number) => `/aquariums/${encodeURIComponent(email)}/${aquariumId}/water-quality`
+    URL: (email: string, aquariumId:string) => `/aquariums/${encodeURIComponent(email)}/${aquariumId}/water-quality`
   }
 } as const;

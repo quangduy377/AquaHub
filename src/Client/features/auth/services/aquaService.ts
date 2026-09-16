@@ -1,12 +1,15 @@
-import type { Aquarium, AquariumPayload } from "../../aquariums/types/aquarium";
+import type { Aquarium, AquariumPayload, WaterReading } from "../../aquariums/types/aquarium";
+
 const GET_METHOD = "GET";
 const POST_METHOD = "POST";
 const PATCH_METHOD = "PATCH";
 const INCLUDE_CREDENTIALS = "include";
 const AQUA_ENDPOINT = "/api/aquariums/";
+const WATER_READINGS_ENDPOINT = (email:string, aquariumId:string) => `/api/aquariums/${email}/${aquariumId}/water-quality`;
 const CONTENT_TYPE_HEADER = "Content-Type";
 const JSON_CONTENT_TYPE = "application/json";
 
+//TODO: The PAYLOAD SHOULD BE DONE HERE, FIX THE REMAINING METHODS
 export async function getExistingAquas(): Promise<Aquarium[]>{
     const response = await fetch(AQUA_ENDPOINT,{
         method: GET_METHOD,
@@ -45,4 +48,18 @@ export async function updateAqua(aquaPayload: AquariumPayload): Promise<Aquarium
     return {...aquaPayload, id: aquaPayload.aquariumId};
 }
 
-
+export async function getWaterReadingsByAquariumId(userEmail:string, aquariumId:string ):Promise<WaterReading[]>{
+  // const waterReadingsPayload:WaterReadingsPayload = {userEmail, aquariumId};
+  console.log("path from client: ",`${WATER_READINGS_ENDPOINT(userEmail,aquariumId)}`);
+  const response = await fetch(`${WATER_READINGS_ENDPOINT(userEmail,aquariumId)}`,{
+      method: GET_METHOD,
+      credentials: INCLUDE_CREDENTIALS,
+      headers: {
+        [CONTENT_TYPE_HEADER]: JSON_CONTENT_TYPE,
+      },
+    });
+  if(!response.ok) throw new Error("Error getting aquarium's readings");
+  const result = await response.json();
+  if (!result || typeof result !== "object" || !Array.isArray(result.readings)) return [];
+  return result.readings;
+}

@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { database } from "../../database/pool.js";
 import type { CreateAquariumInput, UpdateAquariumInput } from "./aquarium.schema.js";
-import type { Aquarium } from "./aquarium.types.js";
+import type { Aquarium, WaterQualityReading } from "./aquarium.types.js";
 
 interface AquariumRow {
   id: string;
@@ -14,6 +14,22 @@ interface AquariumRow {
   tds: number | null;
   created_at: Date;
   updated_at: Date;
+}
+
+interface WaterQualityRow {
+  id: string;
+  aquarium_id: string;
+  recorded_at: Date;
+  ph: number;
+  temperature: number;
+  ammonia: number;
+  nitrite: number;
+  nitrate: number;
+  gh: number;
+  kh: number;
+  tds: number;
+  note: string | null;
+  create_at: Date;
 }
 
 function mapAquarium(row: AquariumRow): Aquarium {
@@ -29,6 +45,21 @@ function mapAquarium(row: AquariumRow): Aquarium {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
+}
+
+function mapWaterQualityReading(row: WaterQualityRow) : WaterQualityReading {
+  return {
+    id: row.id,
+    recordedAt: row.recorded_at,
+    ph: row.ph,
+    temperature: row.temperature,
+    ammonia: row.ammonia,
+    nitrite: row.nitrite,
+    nitrate: row.nitrate,
+    gh: row.gh,
+    tds: row.tds,
+    note: row.note
+  }
 }
 
 export async function findAllByOwner(ownerId: string): Promise<Aquarium[]> {
@@ -86,4 +117,9 @@ export async function deleteByIdAndOwner(id: string, ownerId: string): Promise<b
     [id, ownerId],
   );
   return result.rowCount === 1;
+}
+
+export async function getWaterQualityReadingsById(aquariumId: string): Promise<WaterQualityReading[]> {
+  const result = await database.query<WaterQualityRow>(`SELECT * FROM water_quality_readings WHERE aquarium_id = $1`,[aquariumId]);
+  return result.rows.length > 0 ? result.rows.map(row=>mapWaterQualityReading(row)) : [];
 }

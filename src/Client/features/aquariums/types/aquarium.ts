@@ -20,7 +20,7 @@ export type AquariumType =
   | typeof COMMUNITY_FISH;
 
 export type AquariumPayload = {
-  aquariumId: number;
+  aquariumId: string;
   name: string;
   type: AquariumType;
   volumeLitres: number;
@@ -30,7 +30,7 @@ export type AquariumPayload = {
 };
 
 export interface Aquarium {
-  id: number;
+  id: string;
   name: string;
   type: AquariumType;
   volumeLitres: number;

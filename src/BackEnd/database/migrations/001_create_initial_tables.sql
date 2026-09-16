@@ -24,3 +24,27 @@ CREATE TABLE IF NOT EXISTS aquariums (
 
 CREATE INDEX IF NOT EXISTS aquariums_owner_id_index
   ON aquariums(owner_id);
+
+
+CREATE TABLE IF NOT EXISTS water_quality_readings (
+    id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    aquarium_id UUID NOT NULL,
+    recorded_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    ph DOUBLE PRECISION CHECK (ph >= 0 AND ph <= 14),
+    gh DOUBLE PRECISION CHECK (gh >= 0),
+    kh DECIMAL(5,2) NOT NULL,
+    tds DOUBLE PRECISION CHECK (tds >= 0),
+    temperature DECIMAL(5,2) NOT NULL,
+    ammonia DECIMAL(6,3) NOT NULL CHECK(ammonia >= 0),
+    nitrite DECIMAL(6,3) NOT NULL CHECK(nitrite >= 0),
+    nitrate DECIMAL(6,2) NOT NULL CHECK(nitrate >= 0),
+    note TEXT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_reading_aquarium
+        FOREIGN KEY (aquarium_id)
+        REFERENCES aquariums(id)
+        ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_readings_aquarium_recorded
+    ON water_quality_readings(aquarium_id, recorded_at DESC);

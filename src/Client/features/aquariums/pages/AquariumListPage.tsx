@@ -1,22 +1,21 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AquariumCard from "../components/AquariumCard";
-import { aquariums } from "../data/aquariumData";
+// import { aquariums } from "../data/aquariumData";
 import { type AquariumType, type Aquarium, Action, type AquariumPayload } from "../types/aquarium";
 import { ALL, AQUARIUM_TYPES } from "../types/aquarium";
 import AquariumModal from "../components/AquariumModal";
 import styles from "./AquariumListPage.module.css";
 import { logOut } from "../../auth/services/authService";
 import { getExistingAquas, addAqua, updateAqua } from "../../auth/services/aquaService";
-import {ROUTES} from "../../../routes/AquaRoutes";
-const generateRandomId = (): number => {
-  return Math.floor(Math.random() * 1_000_000);
-};
+import { ROUTES } from "../../../routes/AquaRoutes";
+
+let aquariums: Aquarium[] = [];
 
 function AquariumListPage() {
   const navigate = useNavigate();
-  const {email} = useParams<{email:string}>();
-  const userName = email!.replace("@gmail.com","");
+  const { email } = useParams<{ email: string }>();
+  const userName = email!.replace("@gmail.com", "");
   const [selectedType, setSelectedType] = useState<AquariumType>(ALL);
   const [filteredAquariums, setFilteredAquarium] =
     useState<Aquarium[]>([]);
@@ -25,30 +24,28 @@ function AquariumListPage() {
   const [isUserDropDownOpen, setUserDropDownOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
 
-  useEffect(()=>{
-    async function getAquas(){
-      let aquas: Aquarium[];
-      try{
-        aquas = await getExistingAquas();
+  useEffect(() => {
+    async function getAquas() {
+      try {
+        aquariums = await getExistingAquas();
       }
-      catch(err){
-        if(err instanceof Error){
+      catch (err) {
+        if (err instanceof Error) {
           //TODO: Add error here
           console.log(err.message);
         }
-        aquas = [];
       }
-      setFilteredAquarium(aquas);
+      setFilteredAquarium(aquariums);
     }
     getAquas();
-  },[])
+  }, [])
 
   async function handleSignOut(): Promise<void> {
-    try{
+    try {
       await logOut();
       navigate(ROUTES.LOGIN, { replace: true });
     }
-    catch(err){
+    catch (err) {
       //TODO: should make use of this error
       if (err instanceof Error) {
         console.error(err.message);
@@ -73,7 +70,7 @@ function AquariumListPage() {
   }
 
   function onFilterAquarium() {
-    const filteredAquariums = aquariums.filter((aquarium) => {
+    const newFilteredAquas = aquariums.filter((aquarium) => {
       if (!searchRef.current) return true;
       const matchesSearch = aquarium.name
         .toLowerCase()
@@ -83,7 +80,7 @@ function AquariumListPage() {
         selectedType === ALL || aquarium.type === selectedType;
       return matchesSearch && matchesType;
     });
-    setFilteredAquarium(filteredAquariums);
+    setFilteredAquarium(newFilteredAquas);
   }
 
   async function onUpdateAquarium(
@@ -92,35 +89,35 @@ function AquariumListPage() {
     volumeValue: number,
     pHValue: number,
     gHValue: number,
-    tdsValue: number,): Promise<boolean>{
-      if(!name || !selectedTypeInAdd || !volumeValue ||
+    tdsValue: number,): Promise<boolean> {
+    if (!name || !selectedTypeInAdd || !volumeValue ||
       !pHValue || !gHValue || !tdsValue) return false;
 
-      const payload: AquariumPayload = {
-        aquariumId : selectedAquarium!.id,
-        name : name,
-        type: selectedTypeInAdd,
-        volumeLitres: volumeValue,
-        ph: pHValue,
-        gh: gHValue,
-        tds: tdsValue
-      }
-      try{
-        const updatedAqua = await updateAqua(payload);
-        if(!updatedAqua) return false;
-        setSelectedAquarium(updatedAqua);
-        setFilteredAquarium(prev=>{
-          const newAquas = [...prev];
-          const selectedAquaIndex = newAquas.findIndex(aqua => aqua.id === selectedAquarium!.id);
-          newAquas[selectedAquaIndex] = updatedAqua;
-          return newAquas;
-        });
-        return true;
-      }
-      catch(err){
-        //TODO: Do something with the error
-        return false;
-      }
+    const payload: AquariumPayload = {
+      aquariumId: selectedAquarium!.id,
+      name: name,
+      type: selectedTypeInAdd,
+      volumeLitres: volumeValue,
+      ph: pHValue,
+      gh: gHValue,
+      tds: tdsValue
+    }
+    try {
+      const updatedAqua = await updateAqua(payload);
+      if (!updatedAqua) return false;
+      setSelectedAquarium(updatedAqua);
+      setFilteredAquarium(prev => {
+        const newAquas = [...prev];
+        const selectedAquaIndex = newAquas.findIndex(aqua => aqua.id === selectedAquarium!.id);
+        newAquas[selectedAquaIndex] = updatedAqua;
+        return newAquas;
+      });
+      return true;
+    }
+    catch {
+      //TODO: Do something with the error
+      return false;
+    }
   }
 
 
@@ -148,7 +145,7 @@ function AquariumListPage() {
     const gH = Number(gHValue);
     const tds = Number(tdsValue);
     const newAqua: Aquarium = {
-      id: generateRandomId(),
+      id: "",
       name: name,
       type: selectedTypeInAdd,
       volumeLitres: volumn,
@@ -157,12 +154,12 @@ function AquariumListPage() {
       tds: tds,
     };
 
-    try{
+    try {
       const success = await addAqua(newAqua) != null;
-      if(success) setFilteredAquarium((prevAquas) => [...prevAquas, newAqua]);
+      if (success) setFilteredAquarium((prevAquas) => [...prevAquas, newAqua]);
       return success;
     }
-    catch(err){
+    catch {
       //TODO: Do something with the error
       console.log("add aqua FAILED");
       return false;
@@ -198,7 +195,7 @@ function AquariumListPage() {
               <div className={styles.dropdownMenu} role="menu">
                 <button type="button" role="menuitem">Profile</button>
                 <button type="button" role="menuitem">Settings</button>
-                <button type="button" role="menuitem" onClick={()=>void handleSignOut()}>
+                <button type="button" role="menuitem" onClick={() => void handleSignOut()}>
                   Sign out
                 </button>
               </div>
@@ -208,7 +205,7 @@ function AquariumListPage() {
       </section>
 
       {isAddFormOpen && (
-        <AquariumModal mode={Action.ADD} closeForm={closeForm} onAddAquarium={onAddAquarium}/>
+        <AquariumModal mode={Action.ADD} closeForm={closeForm} onAddAquarium={onAddAquarium} />
       )}
 
       {selectedAquarium && (
@@ -261,7 +258,7 @@ function AquariumListPage() {
       {filteredAquariums.length > 0 ? (
         <section className={styles.grid}>
           {filteredAquariums.map((aquarium) => (
-            <AquariumCard key={aquarium.id} aquarium={aquarium} onViewDetails={openAquariumDetail}/>
+            <AquariumCard key={aquarium.id} aquarium={aquarium} onViewDetails={openAquariumDetail} />
           ))}
         </section>
       ) : (
@@ -276,7 +273,7 @@ function AquariumListPage() {
             onClick={() => {
               setSelectedType(ALL);
               setFilteredAquarium(aquariums);
-              if(searchRef.current) searchRef.current.value = "";
+              if (searchRef.current) searchRef.current.value = "";
             }}
           >
             Clear filters
