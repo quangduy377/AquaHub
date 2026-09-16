@@ -3,6 +3,7 @@ export function formatShortDate(value: string) {
 }
 
 export function formatDate(value: string) {
+  
   return new Intl.DateTimeFormat("en-CA", {
     month: "short",
     day: "numeric",

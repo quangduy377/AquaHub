@@ -21,15 +21,15 @@ interface WaterQualityRow {
   aquarium_id: string;
   recorded_at: Date;
   ph: number;
+  gh: number;
+  kh: number;
+  tds: number;
   temperature: number;
   ammonia: number;
   nitrite: number;
   nitrate: number;
-  gh: number;
-  kh: number;
-  tds: number;
   note: string | null;
-  create_at: Date;
+  created_at: Date;
 }
 
 function mapAquarium(row: AquariumRow): Aquarium {
@@ -58,6 +58,7 @@ function mapWaterQualityReading(row: WaterQualityRow) : WaterQualityReading {
     nitrate: row.nitrate,
     gh: row.gh,
     tds: row.tds,
+    kh: row.kh,
     note: row.note
   }
 }
@@ -122,4 +123,15 @@ export async function deleteByIdAndOwner(id: string, ownerId: string): Promise<b
 export async function getWaterQualityReadingsById(aquariumId: string): Promise<WaterQualityReading[]> {
   const result = await database.query<WaterQualityRow>(`SELECT * FROM water_quality_readings WHERE aquarium_id = $1`,[aquariumId]);
   return result.rows.length > 0 ? result.rows.map(row=>mapWaterQualityReading(row)) : [];
+}
+
+export async function addWaterQualityReading(aquariumId: string, waterReading: WaterQualityReading): Promise<WaterQualityReading | null> {
+  const result = await database.query<WaterQualityRow>(
+    `INSERT INTO water_quality_readings (aquarium_id, recorded_at, ph, gh, kh, tds,
+    temperature, ammonia, nitrite, nitrate, note) 
+    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`
+  ,[aquariumId,waterReading.recordedAt, waterReading.ph, waterReading.gh
+    ,waterReading.kh, waterReading.tds,waterReading.temperature, waterReading.ammonia, waterReading.nitrite
+    ,waterReading.nitrate,waterReading.note]);
+  return result.rows.length > 0 ? mapWaterQualityReading(result.rows[0]!) : null;
 }

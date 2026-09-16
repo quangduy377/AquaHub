@@ -15,11 +15,12 @@ export interface WaterQualityReading {
   id: string;
   recordedAt: Date;
   ph: number;
+  gh: number;
+  kh: number;
+  tds: number;
   temperature: number;
   ammonia: number;
   nitrite: number;
   nitrate: number;
-  gh: number;
-  tds: number;
   note: string | null;
 }

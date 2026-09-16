@@ -8,7 +8,8 @@ import {
   findByIdAndOwner,
   insertAquarium,
   updateByIdAndOwner,
-  getWaterQualityReadingsById
+  getWaterQualityReadingsById,
+  addWaterQualityReading
 } from "./aquarium.repository.js";
 
 const GET_AQUARIUM_NOT_FOUND_MESSAGE = "Aquarium not found";
@@ -17,6 +18,7 @@ const DELETE_AQUARIUM_NOT_FOUND_MESSAGE = "Aquarium not found";
 
 export const listAquariums = findAllByOwner;
 export const createAquarium = insertAquarium;
+export type { CreateAquariumInput };
 
 export async function getAquarium(id: string, ownerId: string) {
   const aquarium = await findByIdAndOwner(id, ownerId);
@@ -44,4 +46,8 @@ export async function getWaterQualityReadings(aquariumId: string): Promise<Water
   return await getWaterQualityReadingsById(aquariumId);
 }
 
-export type { CreateAquariumInput };
+export async function addWaterReading(aquariumId: string, waterReading: WaterQualityReading): Promise<WaterQualityReading | null>{
+  return await addWaterQualityReading(aquariumId, waterReading);
+}
+
+

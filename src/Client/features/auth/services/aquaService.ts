@@ -49,8 +49,6 @@ export async function updateAqua(aquaPayload: AquariumPayload): Promise<Aquarium
 }
 
 export async function getWaterReadingsByAquariumId(userEmail:string, aquariumId:string ):Promise<WaterReading[]>{
-  // const waterReadingsPayload:WaterReadingsPayload = {userEmail, aquariumId};
-  console.log("path from client: ",`${WATER_READINGS_ENDPOINT(userEmail,aquariumId)}`);
   const response = await fetch(`${WATER_READINGS_ENDPOINT(userEmail,aquariumId)}`,{
       method: GET_METHOD,
       credentials: INCLUDE_CREDENTIALS,
@@ -62,4 +60,17 @@ export async function getWaterReadingsByAquariumId(userEmail:string, aquariumId:
   const result = await response.json();
   if (!result || typeof result !== "object" || !Array.isArray(result.readings)) return [];
   return result.readings;
+}
+
+export async function addWaterReading(userEmail:string, aquariumId:string, waterReading:WaterReading):Promise<WaterReading | null>{
+  const response = await fetch(`${WATER_READINGS_ENDPOINT(userEmail,aquariumId)}`,{
+      method: POST_METHOD,
+      credentials: INCLUDE_CREDENTIALS,
+      headers: {
+        [CONTENT_TYPE_HEADER]: JSON_CONTENT_TYPE,
+      },
+      body: JSON.stringify(waterReading),
+    });
+  if(!response.ok) throw new Error("Error adding an aquarium reading");
+  return (await response.json()).reading as WaterReading ?? null;
 }

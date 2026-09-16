@@ -5,7 +5,7 @@ import { parameterMeta } from "../types/aquarium";
 
 interface WaterQualityInputProps {
     aquarium: Aquarium;
-    submitReading: (newReading: WaterReading) => void;
+    submitReading: (newReading: WaterReading) => Promise<void>;
     closeForm: () => void;
 }
 
@@ -31,21 +31,21 @@ export default function WaterQualityInputModal({ aquarium, submitReading, closeF
         setForm((current) => ({ ...current, [key]: finalVal }));
     }
 
-    function saveReading() {
+    async function saveReading() {
         const newReading: WaterReading = {
             id: Date.now(),
             recordedAt: new Date().toISOString(),
             ph: form["ph"],
+            gh: form["gh"],
+            kh: form["kh"],
+            tds: form["tds"],
             temperature: form["temperature"],
             ammonia: form["ammonia"],
             nitrite: form["nitrite"],
             nitrate: form["nitrate"],
-            gh: form["gh"],
-            kh: form["kh"],
-            tds: form["tds"],
             note: form["note"],
         };
-        submitReading(newReading);
+        await submitReading(newReading);
     }
 
 
@@ -57,9 +57,9 @@ export default function WaterQualityInputModal({ aquarium, submitReading, closeF
                     <div><span className={styles.eyebrow}>New measurement</span><h2 id="water-test-title">Add water test</h2><p>Record the latest parameters for {aquarium.name}.</p></div>
                     <button type="button" className={styles.closeButton} aria-label="Close" onClick={closeForm}>×</button>
                 </div>
-                <form onSubmit={(evt) => {
+                <form onSubmit={async (evt) => {
                     evt.preventDefault();
-                    saveReading();
+                    await saveReading();
                 }}>
                     <div className={styles.formGrid}>
                         {parameterMeta.map(({ key, label, unit }) => (

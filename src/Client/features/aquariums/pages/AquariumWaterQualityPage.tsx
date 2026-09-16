@@ -8,7 +8,7 @@ import WaterQualityInputModal from "../components/WaterQualityInputModal";
 import Chart from "../components/Chart";
 import ParameterCard from "../components/ParameterCard";
 import TestHistoryTable from "../components/TestHistoryTable";
-import { getExistingAquas, getWaterReadingsByAquariumId } from "../../auth/services/aquaService";
+import { getExistingAquas, getWaterReadingsByAquariumId, addWaterReading } from "../../auth/services/aquaService";
 import { useParams } from "react-router-dom";
 import { PARAM_ROUTES } from "../../../routes/AquaRoutes";
 
@@ -34,7 +34,6 @@ function AquariumWaterQuality() {
         const aquarium = aquariums.find((item) => item.id === selectedAquariumId) ?? aquariums[0];
         setAquarium(aquarium);
         try {
-          console.log(selectedAquariumId);
           const readings = await getWaterReadingsByAquariumId(email, selectedAquariumId);
           setReadings(readings);
         }
@@ -58,10 +57,22 @@ function AquariumWaterQuality() {
     (reading) => historyFilter === "All" || getReadingStatus(parameterMeta, reading) === historyFilter,
   );
 
-  function submitReading(newReading: WaterReading): void {
-    setReadings(prev => [...prev, newReading]);
-    setIsFormOpen(false);
-    setSaveMessage("Water test saved successfully.");
+  async function submitReading(newReading: WaterReading): Promise<void> {
+    try {
+      const addedreading = await addWaterReading(email, selectedAquariumId, newReading);
+      if (addedreading != null) {
+        setReadings(prev => [...prev, addedreading]);
+        setSaveMessage("Water test saved successfully.");
+        setIsFormOpen(false);
+      }
+      else {
+        //TODO: Should keep the form open, and use dialert to show error message
+      }
+    }
+    catch {
+      //TODO: Make use of the error
+    }
+
   }
 
   return (
@@ -122,7 +133,7 @@ function AquariumWaterQuality() {
 
         {latest ? (
           <div className={styles.parameterGrid}>
-            {parameterMeta.map(el => <ParameterCard reading={latest} parameterInfo={el} />)}
+            {parameterMeta.map((el, index) => <ParameterCard key={index} reading={latest} parameterInfo={el} />)}
           </div>
         ) : <div className={styles.emptyState}>No readings yet. Add a water test to get started.</div>}
       </section>

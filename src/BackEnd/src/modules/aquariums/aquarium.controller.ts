@@ -9,11 +9,14 @@ import {
   getAquarium,
   listAquariums,
   updateAquarium,
-  getWaterQualityReadings
+  getWaterQualityReadings,
+  addWaterReading
 } from "./aquarium.service.js";
+import { WaterQualityReading } from "./aquarium.types.js";
 
 const AUTHENTICATION_REQUIRED_MESSAGE = "Authentication required";
 const INVALID_AQUARIUM_ID_MESSAGE = "Invalid aquarium ID";
+const INVALID_WATER_READING_MESSAGE = "Invalid Water Reading, can't be added";
 
 function ownerIdFrom(request: Request): string {
   if (!request.userId) {
@@ -31,6 +34,14 @@ function aquariumIdFrom(request: Request): string {
     throw new AppError(HTTP_STATUS.BAD_REQUEST, INVALID_AQUARIUM_ID_MESSAGE);
   }
   return result.data;
+}
+
+function parseWaterReading(request: Request): WaterQualityReading | null{
+  const result = request.body as WaterQualityReading;
+  if (!result) {
+    throw new AppError(HTTP_STATUS.BAD_REQUEST, INVALID_WATER_READING_MESSAGE);
+  }
+  return result;
 }
 
 export async function list(request: Request, response: Response): Promise<void> {
@@ -63,4 +74,14 @@ export async function remove(request: Request, response: Response): Promise<void
 export async function getWaterQuality(request: Request, response: Response){
   const readings = await getWaterQualityReadings(aquariumIdFrom(request));
   response.json({readings: readings});
+}
+
+export async function addWaterQualityReading(request: Request, response: Response){
+  const waterReading = parseWaterReading(request);
+  if(!waterReading) {
+    response.status(HTTP_STATUS.BAD_REQUEST).send();
+    return;
+  }
+  const reading = await addWaterReading(aquariumIdFrom(request),waterReading);
+  response.json({reading: reading});
 }
