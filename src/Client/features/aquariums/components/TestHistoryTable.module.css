@@ -8,3 +8,28 @@
 .good { color: #148064; }
 .attention { color: #c47a0c; }
 .critical { color: #d34b4b; }
+.deleteButton {
+  background: #dc2626;        /* đỏ chính */
+  color: #fff;
+  border: 1px solid #b91c1c; /* viền đỏ đậm hơn */
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.deleteButton:hover {
+  background: #b91c1c;
+  border-color: #7f1d1d;
+}
+
+.deleteButton:active {
+  transform: translateY(1px);
+}
+
+.deleteButton:focus-visible {
+  outline: 2px solid #fecaca;
+  outline-offset: 2px;
+}

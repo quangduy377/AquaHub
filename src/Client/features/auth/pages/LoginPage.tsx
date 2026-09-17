@@ -15,26 +15,26 @@ interface FormErrors {
   form?: string;
 }
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const EmailRequiredMsg:string = "Email is required.";
-const EnterValidEmailMsg:string = "Enter a valid email address.";
-const PasswordRequiredMsg:string = "Password is required.";
-const PasswordAtleast6CharsMsg:string = "Password must contain at least 6 characters.";
-const SignInSuccessfulMsg:string = "Signed in successfully.";
-const ResetInstructionMsg:string = "If an account exists for this email, reset instructions will be sent shortly.";
-const KeepAquariumDetailsAndWaterParameterMsg:string = "Keep aquarium details and water parameters organized in one place.";
-const AquaHub:string = "AquaHub";
-const HealthyTankTrackingMsg:string = "Healthy tanks start with better tracking.";
-const A:string = "A";
-const WelComeMsg:string = "Welcome back";
-const ResetPassword:string = "Reset your password";
-const SignInToContinueAquaDashboard:string = "Sign in to continue to your aquarium dashboard.";
-const EnterEmailToGetResetInstruction:string = "Enter your email and we will send you reset instructions.";
-const EmailAddress:string = "Email address";
-const Password:string = "Password";
-const PleaseWait:string = "Please wait...";
-const SingIn:string = "Sign in";
-const SendResetInstruction:string = "Send reset instructions";
-const BackToSignIn:string = "Back to sign in";
+const EmailRequiredMsg: string = "Email is required.";
+const EnterValidEmailMsg: string = "Enter a valid email address.";
+const PasswordRequiredMsg: string = "Password is required.";
+const PasswordAtleast6CharsMsg: string = "Password must contain at least 6 characters.";
+const SignInSuccessfulMsg: string = "Signed in successfully.";
+const ResetInstructionMsg: string = "If an account exists for this email, reset instructions will be sent shortly.";
+const KeepAquariumDetailsAndWaterParameterMsg: string = "Keep aquarium details and water parameters organized in one place.";
+const AquaHub: string = "AquaHub";
+const HealthyTankTrackingMsg: string = "Healthy tanks start with better tracking.";
+const A: string = "A";
+const WelComeMsg: string = "Welcome back";
+const ResetPassword: string = "Reset your password";
+const SignInToContinueAquaDashboard: string = "Sign in to continue to your aquarium dashboard.";
+const EnterEmailToGetResetInstruction: string = "Enter your email and we will send you reset instructions.";
+const EmailAddress: string = "Email address";
+const Password: string = "Password";
+const PleaseWait: string = "Please wait...";
+const SingIn: string = "Sign in";
+const SendResetInstruction: string = "Send reset instructions";
+const BackToSignIn: string = "Back to sign in";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -45,7 +45,7 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-  const [loginError, setLoginError] = useState<string | null >(null);
+  const [loginError, setLoginError] = useState<string | null>(null);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
 
   useEffect(() => {
@@ -56,6 +56,7 @@ export default function LoginPage() {
         const user = await getCurrentUser(controller.signal);
 
         if (user) {
+          //TODO: How to store the user.email
           navigate(PARAM_ROUTES.AQUARIUMS(user.email), { replace: true });
           return;
         }
@@ -69,10 +70,10 @@ export default function LoginPage() {
     void checkSession();
     return () => controller.abort();
   }, [navigate]);
-                 
+
   const isLoginView = view === LOGIN_VIEW;
-  const btnMsgAfterLoading:string = isLoginView ? SingIn : SendResetInstruction;
-  
+  const btnMsgAfterLoading: string = isLoginView ? SingIn : SendResetInstruction;
+
   function validateForm(): FormErrors {
     const nextErrors: FormErrors = {};
 
@@ -104,7 +105,7 @@ export default function LoginPage() {
     }
 
     if (isLoginView) {
-      try{
+      try {
         await login({
           email: email.trim(),
           password,
@@ -112,16 +113,16 @@ export default function LoginPage() {
         setSuccessMessage(SignInSuccessfulMsg);
         navigate(PARAM_ROUTES.AQUARIUMS(email), { replace: true });
       }
-      catch(ex){
-        if(ex instanceof Error){
+      catch (ex) {
+        if (ex instanceof Error) {
           setLoginError(ex.message);
         }
-        else{
+        else {
           setLoginError("unidentify error happened");
         }
       }
     }
-    else{
+    else {
       const successful = await resetPassword(email.trim());
       if (successful) {
         setSuccessMessage(ResetInstructionMsg);
@@ -165,8 +166,8 @@ export default function LoginPage() {
             <span className={styles.mobileBrand}>AquaHub</span>
             <h2>{isLoginView ? WelComeMsg : ResetPassword}</h2>
             <p>
-              {isLoginView ? SignInToContinueAquaDashboard 
-                          : EnterEmailToGetResetInstruction}
+              {isLoginView ? SignInToContinueAquaDashboard
+                : EnterEmailToGetResetInstruction}
             </p>
           </div>
 
@@ -232,13 +233,13 @@ export default function LoginPage() {
                 Forgot password?
               </button>
             )}
-            
+
             {successMessage && <p className={styles.success} role="status">{successMessage}</p>}
             {loginError && <p className={styles.failed} role="status">{loginError}</p>}
 
             <CustomButton isLoading={isSubmitting}
-                          loadingMsg={PleaseWait}
-                          finishedLoadingMsg={btnMsgAfterLoading}/>
+              loadingMsg={PleaseWait}
+              finishedLoadingMsg={btnMsgAfterLoading} />
 
             {!isLoginView && (
               <button

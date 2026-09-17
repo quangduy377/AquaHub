@@ -4,10 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { PARAM_ROUTES } from "../../../routes/AquaRoutes";
 interface AquariumCardProps {
   aquarium: Aquarium;
+  encondedEmail: string;
   onViewDetails: (aquarium: Aquarium) => void;
 }
 
-function AquariumCard({ aquarium, onViewDetails }: AquariumCardProps) {
+function AquariumCard({ aquarium, encondedEmail, onViewDetails }: AquariumCardProps) {
   const navigate = useNavigate();
   const { AQUARIUM_WATER_QUALITY } = PARAM_ROUTES;
   return (
@@ -44,8 +45,7 @@ function AquariumCard({ aquarium, onViewDetails }: AquariumCardProps) {
       </div>
 
       <button className={styles.button} type="button" onClick={() => {
-        //TODO: How to get user-email ????, still hard coded
-        navigate(AQUARIUM_WATER_QUALITY.URL("quangduy377@gmail.com", aquarium.id));
+        navigate(AQUARIUM_WATER_QUALITY.URL(encondedEmail, aquarium.id));
       }}>
         View Water Quality
       </button>

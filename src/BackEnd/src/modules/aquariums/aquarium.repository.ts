@@ -135,3 +135,9 @@ export async function addWaterQualityReading(aquariumId: string, waterReading: W
     ,waterReading.nitrate,waterReading.note]);
   return result.rows.length > 0 ? mapWaterQualityReading(result.rows[0]!) : null;
 }
+
+export async function deleteWaterQualityReading(aquariumId: string, waterReadingId: number):Promise<boolean>{
+  const result = await database.query(`DELETE FROM water_quality_readings 
+    WHERE id = $1 AND aquarium_id = $2`,[waterReadingId, aquariumId]);
+  return result.rowCount === 1;
+}

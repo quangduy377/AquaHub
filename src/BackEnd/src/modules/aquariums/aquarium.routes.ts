@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authenticate } from "../../middleware/authenticate.js";
 import { validateBody } from "../../middleware/validate.js";
-import { create, getOne, list, remove, update, getWaterQuality,addWaterQualityReading } from "./aquarium.controller.js";
+import { create, getOne, list, remove, update, getWaterQuality,addWaterQualityReading,removeWaterQualityReading } from "./aquarium.controller.js";
 import { createAquariumSchema, updateAquariumSchema } from "./aquarium.schema.js";
 
 const BY_ID_ROUTE = "/:aquariumId";
@@ -26,4 +26,6 @@ aquariumRouter.patch(
 aquariumRouter.delete(AQUARIUM_ROUTES.BY_ID, remove);
 aquariumRouter.get(AQUARIUM_ROUTES.BY_ID_TO_WATER_QUALITY, getWaterQuality);
 aquariumRouter.post(AQUARIUM_ROUTES.BY_ID_TO_WATER_QUALITY, addWaterQualityReading);
+aquariumRouter.delete(AQUARIUM_ROUTES.BY_ID_TO_WATER_QUALITY, removeWaterQualityReading);
+
 

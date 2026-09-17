@@ -8,7 +8,7 @@ import WaterQualityInputModal from "../components/WaterQualityInputModal";
 import Chart from "../components/Chart";
 import ParameterCard from "../components/ParameterCard";
 import TestHistoryTable from "../components/TestHistoryTable";
-import { getExistingAquas, getWaterReadingsByAquariumId, addWaterReading } from "../../auth/services/aquaService";
+import { getExistingAquas, getWaterReadingsByAquariumId, addWaterReading, deleteWaterReading } from "../../auth/services/aquaService";
 import { useParams } from "react-router-dom";
 import { PARAM_ROUTES } from "../../../routes/AquaRoutes";
 
@@ -70,6 +70,17 @@ function AquariumWaterQuality() {
       }
     }
     catch {
+      //TODO: Make use of the error
+    }
+  }
+
+  async function deleteReading(readingId: number): Promise<void> {
+    try {
+      await deleteWaterReading(email, selectedAquariumId, readingId)
+      setReadings(prevReadings => prevReadings.filter(rd => rd.id !== readingId));
+    }
+    catch {
+      //TODO: Show dialog saying failed to delete reading. Reading might be deleted before or not exist.
       //TODO: Make use of the error
     }
 
@@ -163,7 +174,7 @@ function AquariumWaterQuality() {
 
         <div className={styles.tableWrap}>
           {filteredHistory.length > 0 ?
-            <TestHistoryTable history={filteredHistory} />
+            <TestHistoryTable history={filteredHistory} deleteReading={deleteReading} />
             : <div className={styles.emptyState}>No tests match this filter.</div>}
         </div>
       </section>

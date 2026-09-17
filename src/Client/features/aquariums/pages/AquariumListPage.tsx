@@ -258,7 +258,11 @@ function AquariumListPage() {
       {filteredAquariums.length > 0 ? (
         <section className={styles.grid}>
           {filteredAquariums.map((aquarium) => (
-            <AquariumCard key={aquarium.id} aquarium={aquarium} onViewDetails={openAquariumDetail} />
+            <AquariumCard key={aquarium.id}
+              aquarium={aquarium}
+              onViewDetails={openAquariumDetail}
+              encondedEmail={encodeURIComponent(email!)}
+            />
           ))}
         </section>
       ) : (

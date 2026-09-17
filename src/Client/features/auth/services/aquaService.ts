@@ -3,6 +3,7 @@ import type { Aquarium, AquariumPayload, WaterReading } from "../../aquariums/ty
 const GET_METHOD = "GET";
 const POST_METHOD = "POST";
 const PATCH_METHOD = "PATCH";
+const DELETE_METHOD = "DELETE";
 const INCLUDE_CREDENTIALS = "include";
 const AQUA_ENDPOINT = "/api/aquariums/";
 const WATER_READINGS_ENDPOINT = (email:string, aquariumId:string) => `/api/aquariums/${email}/${aquariumId}/water-quality`;
@@ -73,4 +74,17 @@ export async function addWaterReading(userEmail:string, aquariumId:string, water
     });
   if(!response.ok) throw new Error("Error adding an aquarium reading");
   return (await response.json()).reading as WaterReading ?? null;
+}
+
+export async function deleteWaterReading(userEmail:string, aquariumId:string, readingId:number):Promise<boolean>{
+  const response = await fetch(`${WATER_READINGS_ENDPOINT(userEmail,aquariumId)}`,{
+      method: DELETE_METHOD,
+      credentials: INCLUDE_CREDENTIALS,
+      headers: {
+        [CONTENT_TYPE_HEADER]: JSON_CONTENT_TYPE,
+      },
+      body: JSON.stringify({readingId}),
+    });
+  if(!response.ok) throw new Error("Error delete an aquarium reading");
+  return true;
 }
