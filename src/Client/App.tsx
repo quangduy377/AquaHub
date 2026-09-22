@@ -3,14 +3,17 @@ import AquariumListPage from "./features/aquariums/pages/AquariumListPage";
 import LoginPage from "./features/auth/pages/LoginPage";
 import AquariumWaterQualityPage from "./features/aquariums/pages/AquariumWaterQualityPage";
 import { ROUTES } from "./routes/AquaRoutes";
+import AppLayout from "./components/AppLayout";
 function App() {
   return (
     <Routes>
       <Route path={ROUTES.LOGIN} element={<LoginPage />} />
-      <Route path={ROUTES.AQUARIUMS} element={<AquariumListPage />} />
+      <Route element={<AppLayout />}>
+        <Route path={ROUTES.AQUARIUMS} element={<AquariumListPage />} />
+        <Route path={ROUTES.AQUARIUM_WATER_QUALITY} element={<AquariumWaterQualityPage />} />
+      </Route>
       <Route path={ROUTES.HOME} element={<Navigate to={ROUTES.LOGIN} replace />} />
       <Route path="*" element={<Navigate to={ROUTES.LOGIN} replace />} />
-      <Route path={ROUTES.AQUARIUM_WATER_QUALITY} element={<AquariumWaterQualityPage />} />
     </Routes>
   )
 }

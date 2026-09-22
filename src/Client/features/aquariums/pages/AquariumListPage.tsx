@@ -1,27 +1,24 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import AquariumCard from "../components/AquariumCard";
 // import { aquariums } from "../data/aquariumData";
 import { type AquariumType, type Aquarium, Action, type AquariumPayload } from "../types/aquarium";
 import { ALL, AQUARIUM_TYPES } from "../types/aquarium";
 import AquariumModal from "../components/AquariumModal";
 import styles from "./AquariumListPage.module.css";
-import { logOut } from "../../auth/services/authService";
 import { getExistingAquas, addAqua, updateAqua } from "../../auth/services/aquaService";
-import { ROUTES } from "../../../routes/AquaRoutes";
 
 let aquariums: Aquarium[] = [];
 
 function AquariumListPage() {
-  const navigate = useNavigate();
   const { email } = useParams<{ email: string }>();
   const userName = email!.replace("@gmail.com", "");
   const [selectedType, setSelectedType] = useState<AquariumType>(ALL);
   const [filteredAquariums, setFilteredAquarium] =
     useState<Aquarium[]>([]);
-  const [isAddFormOpen, setIsAddFormOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const isAddFormOpen = searchParams.get("addAquarium") === "true";
   const [selectedAquarium, setSelectedAquarium] = useState<Aquarium | null>(null);
-  const [isUserDropDownOpen, setUserDropDownOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -40,19 +37,6 @@ function AquariumListPage() {
     getAquas();
   }, [])
 
-  async function handleSignOut(): Promise<void> {
-    try {
-      await logOut();
-      navigate(ROUTES.LOGIN, { replace: true });
-    }
-    catch (err) {
-      //TODO: should make use of this error
-      if (err instanceof Error) {
-        console.error(err.message);
-      }
-    }
-  }
-
   function openAquariumDetail(aquarium: Aquarium) {
     setSelectedAquarium(aquarium);
   }
@@ -61,12 +45,11 @@ function AquariumListPage() {
     setSelectedAquarium(null);
   }
 
-  function openForm() {
-    setIsAddFormOpen(true);
-  }
-
   function closeForm() {
-    setIsAddFormOpen(false);
+    setSearchParams(current => {
+      current.delete("addAquarium");
+      return current;
+    }, { replace: true });
   }
 
   function onFilterAquarium() {
@@ -167,124 +150,101 @@ function AquariumListPage() {
   }
 
   return (
-    <main className={styles.page}>
-      <section className={styles.hero}>
-        <div>
-          <span className={styles.eyebrow}>AquaHub Dashboard</span>
-          <h1>{`${userName} 's Aquariums`}</h1>
-          <p>
-            Track your aquariums and keep an eye on important water parameters.
-          </p>
-        </div>
+    <>
 
-        <div className={styles.heroActions}>
-          <button className={styles.primaryButton} type="button" onClick={openForm}>
-            + Add aquarium
-          </button>
-          <div className={styles.userMenu}>
-            <button
-              className={styles.userMenuButton}
-              type="button"
-              aria-expanded={isUserDropDownOpen}
-              aria-haspopup="menu"
-              onClick={() => setUserDropDownOpen((current) => !current)}>
-              {userName} <span aria-hidden="true">▾</span>
-            </button>
-
-            {isUserDropDownOpen && (
-              <div className={styles.dropdownMenu} role="menu">
-                <button type="button" role="menuitem">Profile</button>
-                <button type="button" role="menuitem">Settings</button>
-                <button type="button" role="menuitem" onClick={() => void handleSignOut()}>
-                  Sign out
-                </button>
-              </div>
-            )}
+      <main className={styles.page}>
+        <section className={styles.hero}>
+          <div>
+            <span className={styles.eyebrow}>AquaHub Dashboard</span>
+            <h1>{`${userName} 's Aquariums`}</h1>
+            <p>
+              Track your aquariums and keep an eye on important water parameters.
+            </p>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {isAddFormOpen && (
-        <AquariumModal mode={Action.ADD} closeForm={closeForm} onAddAquarium={onAddAquarium} />
-      )}
+        {isAddFormOpen && (
+          <AquariumModal mode={Action.ADD} closeForm={closeForm} onAddAquarium={onAddAquarium} />
+        )}
 
-      {selectedAquarium && (
-        <AquariumModal
-          mode={Action.VIEW}
-          onUpdateAquarium={onUpdateAquarium}
-          aquarium={selectedAquarium}
-          closeForm={closeAquariumDetail}
-        />
-      )}
-
-      <section className={styles.filterPanel}>
-        <label className={styles.field}>
-          <span>Search</span>
-
-          <input
-            type="search"
-            ref={searchRef}
-            placeholder="Search aquarium..."
-            onChange={() => onFilterAquarium()}
+        {selectedAquarium && (
+          <AquariumModal
+            mode={Action.VIEW}
+            onUpdateAquarium={onUpdateAquarium}
+            aquarium={selectedAquarium}
+            closeForm={closeAquariumDetail}
           />
-        </label>
+        )}
 
-        <label className={styles.field}>
-          <span>Aquarium type</span>
+        <section className={styles.filterPanel}>
+          <label className={styles.field}>
+            <span>Search</span>
 
-          <select
-            value={selectedType}
-            onChange={(event) =>
-              setSelectedType(event.target.value as AquariumType)
-            }
-          >
-            {AQUARIUM_TYPES.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
-        </label>
-      </section>
-
-      <section className={styles.resultsHeader}>
-        <h2>Your tanks</h2>
-        <span>
-          {filteredAquariums.length}{" "}
-          {filteredAquariums.length === 1 ? "aquarium" : "aquariums"}
-        </span>
-      </section>
-
-      {filteredAquariums.length > 0 ? (
-        <section className={styles.grid}>
-          {filteredAquariums.map((aquarium) => (
-            <AquariumCard key={aquarium.id}
-              aquarium={aquarium}
-              onViewDetails={openAquariumDetail}
-              encondedEmail={encodeURIComponent(email!)}
+            <input
+              type="search"
+              ref={searchRef}
+              placeholder="Search aquarium..."
+              onChange={() => onFilterAquarium()}
             />
-          ))}
-        </section>
-      ) : (
-        <section className={styles.emptyState}>
-          <div className={styles.emptyIcon}>⌕</div>
-          <h2>No aquariums found</h2>
-          <p>Try changing the aquarium name or selected type.</p>
+          </label>
 
-          <button
-            type="button"
-            className={styles.secondaryButton}
-            onClick={() => {
-              setSelectedType(ALL);
-              setFilteredAquarium(aquariums);
-              if (searchRef.current) searchRef.current.value = "";
-            }}
-          >
-            Clear filters
-          </button>
+          <label className={styles.field}>
+            <span>Aquarium type</span>
+
+            <select
+              value={selectedType}
+              onChange={(event) =>
+                setSelectedType(event.target.value as AquariumType)
+              }
+            >
+              {AQUARIUM_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+          </label>
         </section>
-      )}
-    </main>
+
+        <section id="aquariums" className={styles.resultsHeader}>
+          <h2>Your tanks</h2>
+          <span>
+            {filteredAquariums.length}{" "}
+            {filteredAquariums.length === 1 ? "aquarium" : "aquariums"}
+          </span>
+        </section>
+
+        {filteredAquariums.length > 0 ? (
+          <section className={styles.grid}>
+            {filteredAquariums.map((aquarium) => (
+              <AquariumCard key={aquarium.id}
+                aquarium={aquarium}
+                onViewDetails={openAquariumDetail}
+                encondedEmail={encodeURIComponent(email!)}
+              />
+            ))}
+          </section>
+        ) : (
+          <section className={styles.emptyState}>
+            <div className={styles.emptyIcon}>⌕</div>
+            <h2>No aquariums found</h2>
+            <p>Try changing the aquarium name or selected type.</p>
+
+            <button
+              type="button"
+              className={styles.secondaryButton}
+              onClick={() => {
+                setSelectedType(ALL);
+                setFilteredAquarium(aquariums);
+                if (searchRef.current) searchRef.current.value = "";
+              }}
+            >
+              Clear filters
+            </button>
+          </section>
+        )}
+      </main>
+    </>
   );
 }
 

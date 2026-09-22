@@ -1,0 +1,40 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
+.topbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 44px; min-height: 72px; padding: 0 clamp(20px, 5vw, 72px); border-bottom: 1px solid #dfe9e3; background: rgb(250 252 249 / 92%); backdrop-filter: blur(18px); }
+.brand { display: flex; align-items: center; gap: 10px; color: #153d38; font-size: 17px; font-weight: 800; text-decoration: none; letter-spacing: -0.04em; }
+.brandMark { display: grid; width: 31px; height: 31px; place-items: center; border-radius: 10px 10px 10px 3px; color: #fff; background: #167c69; font-size: 17px; }
+.mainNav { display: flex; align-self: stretch; align-items: stretch; gap: 28px; }
+.mainNav a, .navLink { position: relative; display: grid; place-items: center; color: #70827d; font-size: 13px; font-weight: 700; text-decoration: none; }
+.navLink { display: flex !important; align-self: stretch; align-items: center; justify-content: center; gap: 5px; min-height: 72px; border: 0; padding: 0; background: transparent; }
+.navMenu { position: relative; display: flex; align-items: stretch; }
+.navChevron { margin-left: 5px; margin-bottom: 5px; color: #8a9b95; font-size: 14px; }
+.navLinkActive { color: #173b38 !important; }
+.navLinkActive::after { position: absolute; right: 0; bottom: -1px; left: 0; height: 3px; border-radius: 3px 3px 0 0; background: #e27642; content: ""; }
+.navDropdown { position: absolute; top: calc(100% + 1px); left: -14px; width: 178px; padding: 7px; border: 1px solid #e0e9e3; border-radius: 10px; background: #fff; box-shadow: 0 18px 45px rgb(25 61 52 / 15%); }
+.navDropdown a, .navDropdown button { display: flex; align-items: center; width: 100%; border: 0; border-radius: 7px; padding: 10px 11px; color: #46625c; background: transparent; font-size: 11px; font-weight: 700; text-decoration: none; text-align: left; }
+.navDropdown a:hover, .navDropdown button:hover { color: #167c69; background: #f1f7f3; }
+.menuPlus { display: grid; width: 18px; height: 18px; margin-right: 7px; place-items: center; border-radius: 5px; color: #fff; background: #167c69; font-size: 15px; font-weight: 400; }
+.topbarActions { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+.userMenu { position: relative; }
+.userButton { display: flex; align-items: center; gap: 8px; border: 0; padding: 4px; color: #234943; background: transparent; font-size: 12px; font-weight: 800; }
+.avatar { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 50%; color: #fff; background: #d77b52; font-size: 13px; }
+.chevron { margin-left: 1px; color: #79908a; font-size: 16px; }
+.dropdown { position: absolute; top: calc(100% + 12px); right: 0; width: 218px; padding: 8px; border: 1px solid #e0e9e3; border-radius: 12px; background: #fff; box-shadow: 0 18px 45px rgb(25 61 52 / 15%); }
+.dropdownIntro { display: grid; gap: 3px; padding: 11px; border-bottom: 1px solid #edf2ee; font-size: 12px; }
+.dropdownIntro span { color: #859691; font-size: 10px; font-weight: 500; }
+.dropdown button { width: 100%; border: 0; border-radius: 7px; padding: 10px 11px; color: #46625c; background: transparent; text-align: left; font-size: 12px; font-weight: 600; }
+.dropdown button:hover { background: #f1f7f3; color: #167c69; }
+.iconButton { position: relative; display: grid; width: 38px; height: 38px; flex-shrink: 0; place-items: center; border: 1px solid #dbe6df; border-radius: 50%; color: #55716b; background: #fff; font-size: 20px; }
+.topbar { font-family: "Manrope", sans-serif; text-align: left; }
+.topbar button:disabled { cursor: default; }
+.dropdown button:disabled { color: #859691; background: transparent; }
+.topbar a:focus-visible, .topbar button:focus-visible { outline: 2px solid #167c69; outline-offset: 4px; }
+.userName { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dropdownIntro { overflow-wrap: anywhere; }
+.resultsHeader { scroll-margin-top: 140px; }
+@media (max-width: 760px) {
+  .topbar { flex-wrap: wrap; gap: 0 18px; padding: 12px 18px 0; }
+  .mainNav { order: 3; width: 100%; gap: 24px; }
+  .navLink { min-height: 48px; }
+  .userName, .chevron { display: none; }
+  .topbarActions { gap: 8px; }
+}
