@@ -8,11 +8,15 @@
 .formGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding-top: 22px; }
 .field { display: flex; flex-direction: column; gap: 7px; color: #425f5c; font-size: 13px; font-weight: 700; }
 .field small { color: #83938f; font-weight: 500; }
-.field input, .field textarea { width: 100%; border: 1px solid #ccdcda; border-radius: 11px; padding: 0 12px; color: #183130; background: #fff; outline: none; }
-.field input:focus, .field textarea:focus { border-color: #16836f; box-shadow: 0 0 0 4px rgb(22 131 111 / 12%); }
-.field input { min-height: 44px; }
+.field input, .field textarea, .field select { width: 100%; border: 1px solid #ccdcda; border-radius: 11px; padding: 0 12px; color: #183130; background: #fff; outline: none; }
+.field input:focus, .field textarea:focus, .field select:focus { border-color: #16836f; box-shadow: 0 0 0 4px rgb(22 131 111 / 12%); }
+.field input, .field select { min-height: 44px; }
+.field select { cursor: pointer; }
+.field select:disabled, .primaryButton:disabled { cursor: default; opacity: .65; }
+.primaryButton:disabled:hover { background: #16836f; transform: none; }
 .field textarea { padding-top: 11px; resize: vertical; }
 .fullWidth { grid-column: 1 / -1; }
+.tankField { width: calc((100% - 16px) / 2); }
 .formActions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
 .primaryButton, .cancelButton { min-height: 48px; border-radius: 12px; padding: 0 18px; font-weight: 750; }
 .primaryButton { border: 0; color: #fff; background: #16836f; box-shadow: 0 10px 24px rgb(22 131 111 / 20%); }
@@ -23,6 +27,7 @@
 @media (max-width: 650px) {
   .formGrid { grid-template-columns: 1fr; }
   .fullWidth { grid-column: auto; }
+  .tankField { width: 100%; }
   .modal { padding: 21px; }
   .backdrop { align-items: end; padding: 10px; }
   .formActions { flex-direction: column-reverse; }

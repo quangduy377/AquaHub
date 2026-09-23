@@ -5,7 +5,8 @@ import { parameterMeta } from "../types/aquarium";
 
 interface WaterQualityInputProps {
     aquarium: Aquarium;
-    submitReading: (newReading: WaterReading) => Promise<void>;
+    aquariums: Aquarium[];
+    submitReading: (newReading: WaterReading, aquariumId: string) => Promise<void>;
     closeForm: () => void;
 }
 
@@ -21,8 +22,11 @@ const emptyForm: ReadingForm = {
     note: "",
 };
 
-export default function WaterQualityInputModal({ aquarium, submitReading, closeForm }: WaterQualityInputProps) {
+export default function WaterQualityInputModal({ aquarium, aquariums, submitReading, closeForm }: WaterQualityInputProps) {
     const [form, setForm] = useState<ReadingForm>(emptyForm);
+    const [selectedAquariumId, setSelectedAquariumId] = useState(aquarium.id);
+    const [isSaving, setIsSaving] = useState(false);
+    const selectedAquarium = aquariums.find(item => item.id === selectedAquariumId);
 
     function updateData(key: keyof ReadingForm, value: string) {
         let finalVal: string | number;
@@ -32,6 +36,7 @@ export default function WaterQualityInputModal({ aquarium, submitReading, closeF
     }
 
     async function saveReading() {
+        if (!selectedAquarium || isSaving) return;
         const newReading: WaterReading = {
             id: Date.now(),
             recordedAt: new Date().toISOString(),
@@ -45,7 +50,12 @@ export default function WaterQualityInputModal({ aquarium, submitReading, closeF
             nitrate: form["nitrate"],
             note: form["note"],
         };
-        await submitReading(newReading);
+        setIsSaving(true);
+        try {
+            await submitReading(newReading, selectedAquarium.id);
+        } finally {
+            setIsSaving(false);
+        }
     }
 
 
@@ -54,7 +64,7 @@ export default function WaterQualityInputModal({ aquarium, submitReading, closeF
         <div className={styles.backdrop} role="presentation" onMouseDown={(event) => event.target === event.currentTarget && closeForm()}>
             <section className={styles.modal} role="dialog" aria-modal="true" aria-labelledby="water-test-title">
                 <div className={styles.modalHeader}>
-                    <div><span className={styles.eyebrow}>New measurement</span><h2 id="water-test-title">Add water test</h2><p>Record the latest parameters for {aquarium.name}.</p></div>
+                    <div><span className={styles.eyebrow}>New measurement</span><h2 id="water-test-title">Add water test</h2><p>Record the latest parameters for {selectedAquarium?.name ?? "your tank"}.</p></div>
                     <button type="button" className={styles.closeButton} aria-label="Close" onClick={closeForm}>×</button>
                 </div>
                 <form onSubmit={async (evt) => {
@@ -62,6 +72,15 @@ export default function WaterQualityInputModal({ aquarium, submitReading, closeF
                     await saveReading();
                 }}>
                     <div className={styles.formGrid}>
+                        <label className={`${styles.field} ${styles.fullWidth} ${styles.tankField}`}>
+                            <span>Tank</span>
+                            <select required value={selectedAquariumId} disabled={isSaving}
+                                onChange={event => setSelectedAquariumId(event.target.value)}>
+                                {aquariums.map(item => (
+                                    <option key={item.id} value={item.id}>{item.name}</option>
+                                ))}
+                            </select>
+                        </label>
                         {parameterMeta.map(({ key, label, unit }) => (
                             <label className={styles.field} key={key}>
                                 <span>{label} {unit && <small>({unit})</small>}</span>
@@ -79,7 +98,9 @@ export default function WaterQualityInputModal({ aquarium, submitReading, closeF
                     </div>
                     <div className={styles.formActions}>
                         <button className={styles.cancelButton} type="button" onClick={closeForm}>Cancel</button>
-                        <button className={styles.primaryButton} type="submit">Save water test</button>
+                        <button className={styles.primaryButton} type="submit" disabled={isSaving || !selectedAquarium}>
+                            {isSaving ? "Saving..." : "Save water test"}
+                        </button>
                     </div>
                 </form>
             </section>

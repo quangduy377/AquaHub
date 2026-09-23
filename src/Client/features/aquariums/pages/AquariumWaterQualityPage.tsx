@@ -9,33 +9,51 @@ import Chart from "../components/Chart";
 import ParameterCard from "../components/ParameterCard";
 import TestHistoryTable from "../components/TestHistoryTable";
 import { getExistingAquas, getWaterReadingsByAquariumId, addWaterReading, deleteWaterReading } from "../../auth/services/aquaService";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { PARAM_ROUTES } from "../../../routes/AquaRoutes";
 
 
 
 function AquariumWaterQuality() {
   const params = useParams();
+  const navigate = useNavigate();
   const { AQUARIUM_WATER_QUALITY } = PARAM_ROUTES;
   const aquariumId = params[AQUARIUM_WATER_QUALITY.AquariumIdParamKey]!;
   const email = params[AQUARIUM_WATER_QUALITY.EmailParamKey]!;
-  const [selectedAquariumId, setSelectedAquariumId] = useState<string>(aquariumId!);
+  const selectedAquariumId = aquariumId;
   const [readings, setReadings] = useState<WaterReading[]>([]);
   const [historyFilter, setHistoryFilter] = useState<HistoryFilter>("All");
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const isFormOpen = searchParams.get("addWaterTest") === "true";
   const [saveMessage, setSaveMessage] = useState("");
   const [aquarium, setAquarium] = useState<Aquarium | null>(null);
   const [aquariums, setAquariums] = useState<Aquarium[]>([]);
+
+  function openForm() {
+    setSearchParams(current => {
+      current.set("addWaterTest", "true");
+      return current;
+    });
+  }
+
+  function closeForm() {
+    setSearchParams(current => {
+      current.delete("addWaterTest");
+      return current;
+    }, { replace: true });
+  }
   useEffect(() => {
+    let cancelled = false;
     async function fetchData() {
       try {
         const aquariums = await getExistingAquas();
+        if (cancelled) return;
         setAquariums(aquariums);
         const aquarium = aquariums.find((item) => item.id === selectedAquariumId) ?? aquariums[0];
         setAquarium(aquarium);
         try {
           const readings = await getWaterReadingsByAquariumId(email, selectedAquariumId);
-          setReadings(readings);
+          if (!cancelled) setReadings(readings);
         }
         //Do nothing for now
         catch (err) {
@@ -49,7 +67,8 @@ function AquariumWaterQuality() {
       }
     }
     fetchData();
-  }, [selectedAquariumId]);
+    return () => { cancelled = true; };
+  }, [email, selectedAquariumId]);
 
   const latest = readings[0];
   const latestStatus = latest ? getReadingStatus(parameterMeta, latest) : "Attention";
@@ -57,13 +76,25 @@ function AquariumWaterQuality() {
     (reading) => historyFilter === "All" || getReadingStatus(parameterMeta, reading) === historyFilter,
   );
 
-  async function submitReading(newReading: WaterReading): Promise<void> {
+  async function submitReading(newReading: WaterReading, targetAquariumId: string): Promise<void> {
     try {
-      const addedreading = await addWaterReading(email, selectedAquariumId, newReading);
+      const addedreading = await addWaterReading(email, targetAquariumId, newReading);
       if (addedreading != null) {
-        setReadings(prev => [...prev, addedreading]);
-        setSaveMessage("Water test saved successfully.");
-        setIsFormOpen(false);
+        if (targetAquariumId === selectedAquariumId) {
+          setReadings(prev => [addedreading, ...prev]);
+        } else {
+          setAquarium(aquariums.find(item => item.id === targetAquariumId) ?? null);
+          setReadings([addedreading]);
+        }
+        setHistoryFilter("All");
+        const tankName = aquariums.find(item => item.id === targetAquariumId)?.name;
+        setSaveMessage(tankName ? `Water test saved for ${tankName}.` : "Water test saved successfully.");
+        const nextSearchParams = new URLSearchParams(searchParams);
+        nextSearchParams.delete("addWaterTest");
+        navigate({
+          pathname: AQUARIUM_WATER_QUALITY.URL(encodeURIComponent(email), targetAquariumId),
+          search: nextSearchParams.toString(),
+        }, { replace: true });
       }
       else {
         //TODO: Should keep the form open, and use dialert to show error message
@@ -100,8 +131,10 @@ function AquariumWaterQuality() {
             <select
               value={selectedAquariumId}
               onChange={(event) => {
-                console.log("aqua id client: ", event.target.value);
-                setSelectedAquariumId(event.target.value);
+                const nextAquariumId = event.target.value;
+                setAquarium(aquariums.find(item => item.id === nextAquariumId) ?? null);
+                setReadings([]);
+                navigate(AQUARIUM_WATER_QUALITY.URL(encodeURIComponent(email), nextAquariumId));
                 setHistoryFilter("All");
                 setSaveMessage("");
               }}
@@ -109,7 +142,7 @@ function AquariumWaterQuality() {
               {aquariums.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
             </select>
           </label>
-          <button className={styles.primaryButton} type="button" onClick={() => setIsFormOpen(true)}>
+          <button className={styles.primaryButton} type="button" disabled={!aquarium} onClick={openForm}>
             + Add water test
           </button>
         </div>
@@ -179,10 +212,11 @@ function AquariumWaterQuality() {
         </div>
       </section>
 
-      {isFormOpen &&
-        <WaterQualityInputModal aquarium={aquarium!}
+      {isFormOpen && aquarium &&
+        <WaterQualityInputModal aquarium={aquarium}
+          aquariums={aquariums}
           submitReading={submitReading}
-          closeForm={() => setIsFormOpen(false)} />
+          closeForm={closeForm} />
       }
     </main>
   );
