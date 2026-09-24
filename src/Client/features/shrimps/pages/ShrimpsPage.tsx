@@ -1,5 +1,5 @@
 ﻿import { useState } from "react";
-import styles from "./TestingShrimpsPage.module.css";
+import styles from "./ShrimpsPage.module.css";
 import { Link } from "react-router-dom";
 import { PARAM_ROUTES } from "../../../routes/AquaRoutes";
 import { shrimps } from "../data/shrimps";

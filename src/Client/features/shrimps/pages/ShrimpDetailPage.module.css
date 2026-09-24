@@ -2,12 +2,7 @@
 .backLink { display: inline-block; color: #167c69; text-decoration: none; font-size: 14px; }
 .backLink:hover { text-decoration: underline; }
 .layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 36px; margin-top: 24px; align-items: start; }
-.mainImage { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: contain; background: #e0f5fc; border-radius: 16px; }
-.thumbnails { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; }
-.thumbnail { width: 100px; padding: 3px; border: 2px solid transparent; border-radius: 10px; background: #fff; overflow: hidden; }
-.thumbnail[aria-pressed="true"] { border-color: #167c69; }
-.thumbnail img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 5px; }
-.thumbnail:focus-visible, .backLink:focus-visible { outline: 2px solid #167c69; outline-offset: 4px; }
+.backLink:focus-visible { outline: 2px solid #167c69; outline-offset: 4px; }
 .info { padding: 28px; border: 1px solid #d2e9f2; border-radius: 16px; background: #fff; }
 .info h1 { margin: 10px 0 28px; font-size: clamp(24px, 3vw, 34px); color: #153d38; }
 .info h2 { font-size: 18px; margin: 0 0 18px; }

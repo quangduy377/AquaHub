@@ -1,6 +1,6 @@
 export const ShrimpTypes = {
-    Neocardiana: "Neocardiana",
-    Cardiana : "Cardiana"
+    Neocardiana: "Neocaridina",
+    Cardiana : "Caridina"
 } as const
 
 export type Category = (typeof ShrimpTypes)[keyof typeof ShrimpTypes];

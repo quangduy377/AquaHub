@@ -1,0 +1,6 @@
+.mainImage { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: contain; background: #e0f5fc; border-radius: 16px; }
+.thumbnails { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; }
+.thumbnail { width: 100px; padding: 3px; border: 2px solid transparent; border-radius: 10px; background: #fff; overflow: hidden; }
+.thumbnail[aria-pressed="true"] { border-color: #167c69; }
+.thumbnail img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 5px; }
+.thumbnail:focus-visible { outline: 2px solid #167c69; outline-offset: 4px; }
