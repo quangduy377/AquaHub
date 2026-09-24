@@ -1,0 +1,174 @@
+.page {
+  width: min(1240px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 32px 0 64px;
+}
+
+.heading {
+  margin: 0 0 24px;
+  color: #153d38;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(180px, 1fr);
+  gap: 18px;
+  padding: 20px;
+  border: 1px solid #d2e9f2;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #425f5c;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #ccdcda;
+  border-radius: 10px;
+  background: #fff;
+  color: #183130;
+  font-weight: 400;
+}
+
+.field input:focus-visible,
+.field select:focus-visible,
+.clearButton:focus-visible {
+  outline: 2px solid #167c69;
+  outline-offset: 3px;
+}
+
+.resultCount {
+  margin: 20px 0 16px;
+  color: #607573;
+  font-size: 13px;
+}
+
+.emptyState {
+  padding: 40px 20px;
+  border: 1px dashed #bdd3cf;
+  border-radius: 20px;
+  background: #fff;
+  text-align: center;
+}
+
+.emptyState h2 {
+  margin: 0 0 10px;
+  font-size: 22px;
+}
+
+.emptyState p {
+  color: #607573;
+}
+
+.clearButton {
+  padding: 10px 16px;
+  border: 1px solid #bdd3cf;
+  border-radius: 10px;
+  background: #eef8f5;
+  color: #126f5f;
+  font-weight: 600;
+}
+
+.clearButton:hover {
+  background: #e0f1eb;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.card {
+  overflow: hidden;
+  border: 1px solid #d2e9f2;
+  /* border-radius: 20px; */
+  background: #fff;
+  box-shadow: 0 2px 4px rgb(26 64 61 / 3%);
+}
+
+.imageFrame {
+  padding: 14px 0 16px;
+  background: #e0f5fc;
+}
+
+.image {
+  transition: transform 220ms ease;
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  background: #143b39;
+}
+
+.content {
+  padding: 8px 20px 20px;
+  color: #204876;
+}
+
+.imageLink { display: block; overflow: hidden; }
+.imageLink:hover .image, .imageLink:focus-visible .image { transform: scale(1.06); }
+.imageLink:focus-visible { outline: 3px solid #167c69; outline-offset: -3px; }
+@media (prefers-reduced-motion: reduce) {
+  .image { transition: none; }
+}
+
+.note {
+  margin: 0 0 10px;
+  font-size: 9px;
+  font-style: italic;
+  line-height: 1.6;
+}
+
+.category {
+  margin: 0 0 10px;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.name {
+  margin: 0 0 18px;
+  color: #001a35;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.options {
+  margin: 5px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+@media (max-width: 1000px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .page {
+    width: calc(100% - 28px);
+    padding-top: 24px;
+  }
+
+  .filters,
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

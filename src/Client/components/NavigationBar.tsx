@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { getCurrentUser, logOut } from "../features/auth/services/authService";
 import { getExistingAquas } from "../features/auth/services/aquaService";
 import { PARAM_ROUTES, ROUTES } from "../routes/AquaRoutes";
@@ -7,6 +7,8 @@ import styles from "./NavigationBar.module.css";
 
 export default function NavigationBar() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const isShrimps = pathname === ROUTES.TESTING_SHRIMPS || pathname.startsWith(`${ROUTES.TESTING_SHRIMPS}/`);
   const { email: routeEmail, aquariumId } = useParams();
   const [sessionEmail, setSessionEmail] = useState<string>();
   const [firstAquariumId, setFirstAquariumId] = useState<string>();
@@ -85,7 +87,7 @@ export default function NavigationBar() {
       </Link>
       <nav className={styles.mainNav} aria-label="Main navigation">
         <div className={styles.navMenu}>
-          <button id="aquarium-nav-toggle" className={`${styles.navLink} ${!isWaterQuality ? styles.navLinkActive : ""}`} type="button"
+          <button id="aquarium-nav-toggle" className={`${styles.navLink} ${!isWaterQuality && !isShrimps ? styles.navLinkActive : ""}`} type="button"
             aria-expanded={isAquariumMenuOpen} aria-controls="aquarium-nav-dropdown"
             onClick={() => { setIsAquariumMenuOpen(current => !current); setUserDropDownOpen(false); setIsWaterQualityMenuOpen(false); }}>
             Aquariums <span className={styles.navChevron} aria-hidden="true">⌄</span>
@@ -125,6 +127,18 @@ export default function NavigationBar() {
             </div>
           )}
         </div>
+        <Link
+          to={ROUTES.TESTING_SHRIMPS}
+          className={`${styles.navLink} ${isShrimps ? styles.navLinkActive : ""}`}
+          aria-current={isShrimps ? "page" : undefined}
+          onClick={() => {
+            setIsAquariumMenuOpen(false);
+            setIsWaterQualityMenuOpen(false);
+            setUserDropDownOpen(false);
+          }}
+        >
+          Shrimps
+        </Link>
       </nav>
       <div className={styles.topbarActions}>
         <div className={styles.userMenu}>
